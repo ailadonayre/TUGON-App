@@ -1,0 +1,49 @@
+name: tugon_app
+description: A barangay help mobile app for community services, reports, and announcements.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.14.0
+  firebase_storage: ^11.6.0
+
+  # Google Sign In
+  google_sign_in: ^6.2.1
+
+  # State Management
+  provider: ^6.1.1
+
+  # UI Components
+  cupertino_icons: ^1.0.6
+  google_fonts: ^6.1.0
+  flutter_svg: ^2.0.9
+
+  # Utilities
+  intl: ^0.18.1
+  shared_preferences: ^2.2.2
+
+  # Phone & SMS
+  country_code_picker: ^3.0.0
+  pinput: ^3.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+
+  # Add your assets here
+  assets:
+    - assets/images/
+    - assets/icons/
