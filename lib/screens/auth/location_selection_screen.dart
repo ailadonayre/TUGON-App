@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
 import '../../widgets/custom_button.dart';
-import '../../models/barangay_model.dart';
 import '../../providers/user_provider.dart';
 import '../../services/location_service.dart';
 import 'residency_check_screen.dart';
@@ -204,8 +203,8 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
             value: value,
             hint: Text(hint),
             isExpanded: true,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.symmetric(
                 horizontal: 20,
                 vertical: 18,
               ),
