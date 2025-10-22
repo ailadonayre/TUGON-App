@@ -9,7 +9,7 @@ class CustomButton extends StatelessWidget {
   final bool isOutlined;
   final Color? color;
   final Color? textColor;
-  final IconData? icon;
+  final Widget? icon; // <-- change type to Widget
   final double? width;
 
   const CustomButton({
@@ -20,7 +20,7 @@ class CustomButton extends StatelessWidget {
     this.isOutlined = false,
     this.color,
     this.textColor,
-    this.icon,
+    this.icon, // <-- no change needed here
     this.width,
   });
 
@@ -74,7 +74,7 @@ class CustomButton extends StatelessWidget {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 20),
+          icon!, // <-- now you can directly use the widget
           const SizedBox(width: 8),
           Text(
             text,

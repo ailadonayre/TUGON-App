@@ -6,12 +6,18 @@ import 'dart:async';
 import '../../utils/colors.dart';
 import '../../widgets/custom_button.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../services/auth_service.dart';
 import '../../models/user_model.dart';
 import 'pending_approval_screen.dart';
 
 class SmsVerificationScreen extends StatefulWidget {
-  const SmsVerificationScreen({super.key});
+  final String phoneNumber;
+
+  const SmsVerificationScreen({
+    super.key,
+    required this.phoneNumber,
+  });
 
   @override
   State<SmsVerificationScreen> createState() => _SmsVerificationScreenState();
@@ -57,16 +63,13 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
   }
 
   Future<void> _sendVerificationCode() async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final phoneNumber = userProvider.registrationData['phone'] ?? '';
-
     setState(() {
       _isLoading = true;
     });
 
     try {
       await _authService.verifyPhoneNumber(
-        phoneNumber,
+        widget.phoneNumber,
             (verificationId) {
           setState(() {
             _verificationId = verificationId;
@@ -180,18 +183,18 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
         );
       }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-    final phoneNumber = userProvider.registrationData['phone'] ?? '';
-    final maskedPhone = phoneNumber.isNotEmpty
-        ? '${phoneNumber.substring(0, 4)}****${phoneNumber.substring(8)}'
+    final maskedPhone = widget.phoneNumber.isNotEmpty
+        ? '${widget.phoneNumber.substring(0, 4)}****${widget.phoneNumber.substring(8)}'
         : '';
 
     final defaultPinTheme = PinTheme(

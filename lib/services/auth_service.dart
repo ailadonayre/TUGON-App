@@ -3,12 +3,14 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn.standard(); // ✅ Updated constructor
 
   User? get currentUser => _auth.currentUser;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  // Email & Password Sign Up
+  // -----------------------------------------------------------
+  // EMAIL & PASSWORD SIGN UP
+  // -----------------------------------------------------------
   Future<UserCredential> signUpWithEmailPassword(
       String email,
       String password,
@@ -23,7 +25,9 @@ class AuthService {
     }
   }
 
-  // Email & Password Sign In
+  // -----------------------------------------------------------
+  // EMAIL & PASSWORD SIGN IN
+  // -----------------------------------------------------------
   Future<UserCredential> signInWithEmailPassword(
       String email,
       String password,
@@ -38,27 +42,35 @@ class AuthService {
     }
   }
 
-  // Google Sign In
+  // -----------------------------------------------------------
+  // GOOGLE SIGN IN
+  // -----------------------------------------------------------
   Future<UserCredential?> signInWithGoogle() async {
     try {
+      // Trigger Google Sign-In flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return null;
+      if (googleUser == null) return null; // User cancelled
 
+      // Get Google authentication details
       final GoogleSignInAuthentication googleAuth =
       await googleUser.authentication;
 
-      final credential = GoogleAuthProvider.credential(
+      // Create Firebase credential
+      final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
+      // Sign in with Firebase
       return await _auth.signInWithCredential(credential);
     } catch (e) {
       throw Exception('Google sign in failed: ${e.toString()}');
     }
   }
 
-  // Phone Authentication - Send Code
+  // -----------------------------------------------------------
+  // PHONE AUTHENTICATION - SEND VERIFICATION CODE
+  // -----------------------------------------------------------
   Future<String> verifyPhoneNumber(
       String phoneNumber,
       Function(String verificationId) codeSent,
@@ -67,7 +79,7 @@ class AuthService {
     String verificationIdResult = '';
 
     await _auth.verifyPhoneNumber(
-      phoneNumber: '+63${phoneNumber.substring(1)}', // Convert 09XX to +639XX
+      phoneNumber: '+63${phoneNumber.substring(1)}', // Convert 09XX → +639XX
       verificationCompleted: (PhoneAuthCredential credential) async {
         // Auto-verification (Android only)
         await _auth.signInWithCredential(credential);
@@ -88,7 +100,9 @@ class AuthService {
     return verificationIdResult;
   }
 
-  // Verify SMS Code
+  // -----------------------------------------------------------
+  // VERIFY SMS CODE
+  // -----------------------------------------------------------
   Future<UserCredential> verifyPhoneCode(
       String verificationId,
       String smsCode,
@@ -104,7 +118,9 @@ class AuthService {
     }
   }
 
-  // Link Phone Credential to existing user
+  // -----------------------------------------------------------
+  // LINK PHONE NUMBER TO EXISTING USER
+  // -----------------------------------------------------------
   Future<void> linkPhoneCredential(
       String verificationId,
       String smsCode,
@@ -120,7 +136,9 @@ class AuthService {
     }
   }
 
-  // Send Email Verification
+  // -----------------------------------------------------------
+  // SEND EMAIL VERIFICATION
+  // -----------------------------------------------------------
   Future<void> sendEmailVerification() async {
     try {
       await currentUser?.sendEmailVerification();
@@ -129,7 +147,9 @@ class AuthService {
     }
   }
 
-  // Password Reset
+  // -----------------------------------------------------------
+  // PASSWORD RESET
+  // -----------------------------------------------------------
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
@@ -138,15 +158,19 @@ class AuthService {
     }
   }
 
-  // Sign Out
+  // -----------------------------------------------------------
+  // SIGN OUT
+  // -----------------------------------------------------------
   Future<void> signOut() async {
     await Future.wait([
       _auth.signOut(),
-      _googleSignIn.signOut(),
+      _googleSignIn.disconnect(), // ✅ use disconnect() for latest API
     ]);
   }
 
-  // Exception Handler
+  // -----------------------------------------------------------
+  // EXCEPTION HANDLER
+  // -----------------------------------------------------------
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'weak-password':

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
 import '../../widgets/custom_button.dart';
+import '../../providers/user_provider.dart';
 import 'verification_required_screen.dart';
 import 'registration_form_screen.dart';
 
@@ -82,17 +83,20 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: AppColors.goldenYellow.withOpacity(0.1),
+                          color: AppColors.goldenYellow
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppColors.goldenYellow.withOpacity(0.3),
+                            color: AppColors.goldenYellow
+                                .withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(
                           children: [
                             Icon(
                               Icons.info_outline,
-                              color: AppColors.goldenYellow.withOpacity(0.8),
+                              color: AppColors.goldenYellow
+                                  .withValues(alpha: 0.8),
                               size: 28,
                             ),
                             const SizedBox(width: 16),
@@ -169,7 +173,7 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.warmOrange.withOpacity(0.1)
+              ? AppColors.warmOrange.withValues(alpha: 0.1)
               : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(

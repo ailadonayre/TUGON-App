@@ -46,7 +46,6 @@ class _LoginScreenState extends State<LoginScreen> {
               MaterialPageRoute(builder: (_) => const PendingApprovalScreen()),
             );
           } else if (user?.status == 'approved') {
-            // Navigate to dashboard (will implement later)
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Login successful! Dashboard coming soon.')),
             );
@@ -160,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   label: 'Email Address',
                   hint: 'Enter your email',
                   keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icons.email_outlined,
+                  prefixIcon: Icon(Icons.email_outlined),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -177,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   label: 'Password',
                   hint: 'Enter your password',
                   obscureText: _obscurePassword,
-                  prefixIcon: Icons.lock_outline,
+                  prefixIcon: Icon(Icons.lock_outline),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -246,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   isLoading: authProvider.isLoading,
                   color: Colors.white,
                   textColor: AppColors.softBlack,
-                  icon: Icons.g_mobiledata,
+                  icon: const Icon(Icons.g_mobiledata, size: 30, color: Colors.redAccent),
                 ),
                 const SizedBox(height: 24),
                 Row(

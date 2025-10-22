@@ -5,11 +5,12 @@ import '../utils/colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
+  final TextCapitalization textCapitalization;
   final String label;
   final String hint;
   final bool obscureText;
   final TextInputType? keyboardType;
-  final IconData? prefixIcon;
+  final Widget? prefixIcon;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final int? maxLength;
@@ -20,6 +21,7 @@ class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
     required this.controller,
+    this.textCapitalization = TextCapitalization.none,
     required this.label,
     required this.hint,
     this.obscureText = false,
@@ -49,6 +51,7 @@ class CustomTextField extends StatelessWidget {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
+          textCapitalization: textCapitalization,
           obscureText: obscureText,
           keyboardType: keyboardType,
           validator: validator,
@@ -65,9 +68,7 @@ class CustomTextField extends StatelessWidget {
             hintStyle: GoogleFonts.dmSans(
               color: Colors.grey.shade400,
             ),
-            prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, color: Colors.grey.shade600)
-                : null,
+            prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
             counterText: '',
             filled: true,

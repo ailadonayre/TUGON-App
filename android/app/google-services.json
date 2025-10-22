@@ -33,6 +33,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:77868161415:android:09375a0ef02c1d2d445b22",
+        "android_client_info": {
+          "package_name": "com.example.tugon_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "77868161415-mmrsm31iv4p3q01vvd4abcmhdfhfdg2b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCidUjDHIkYTvxIrYdoNI80xM6ss0qhZsY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "77868161415-mmrsm31iv4p3q01vvd4abcmhdfhfdg2b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

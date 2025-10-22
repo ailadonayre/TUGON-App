@@ -140,17 +140,17 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.goldenYellow.withOpacity(0.1),
+                    color: AppColors.goldenYellow.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.goldenYellow.withOpacity(0.3),
+                      color: AppColors.goldenYellow.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
                     children: [
                       Icon(
                         Icons.warning_amber_rounded,
-                        color: AppColors.goldenYellow.withOpacity(0.8),
+                        color: AppColors.goldenYellow.withValues(alpha: 0.8),
                         size: 24,
                       ),
                       const SizedBox(width: 12),
@@ -173,7 +173,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   label: 'Admin Email',
                   hint: 'Enter your admin email',
                   keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icons.email_outlined,
+                  prefixIcon: const Icon(Icons.email_outlined),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -190,7 +190,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   label: 'Password',
                   hint: 'Enter your password',
                   obscureText: _obscurePassword,
-                  prefixIcon: Icons.lock_outline,
+                  prefixIcon: const Icon(Icons.lock_outline),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword

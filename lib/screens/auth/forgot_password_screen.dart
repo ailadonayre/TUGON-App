@@ -75,94 +75,94 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Form(
       key: _formKey,
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           const SizedBox(height: 20),
-      Center(
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.warmOrange.withOpacity(0.1),
-            shape: BoxShape.circle,
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.warmOrange.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.lock_reset,
+                size: 60,
+                color: AppColors.warmOrange,
+              ),
+            ),
           ),
-          child: const Icon(
-            Icons.lock_reset,
-            size: 60,
-            color: AppColors.warmOrange,
+          const SizedBox(height: 24),
+          Center(
+            child: Text(
+              'Forgot Password?',
+              style: GoogleFonts.dmSans(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: AppColors.softBlack,
+              ),
+            ),
           ),
-        ),
-      ),
-      const SizedBox(height: 24),
-      Center(
-        child: Text(
-          'Forgot Password?',
-          style: GoogleFonts.dmSans(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: AppColors.softBlack,
+          const SizedBox(height: 8),
+          Center(
+            child: Text(
+              'No worries, we\'ll send you reset instructions',
+              style: GoogleFonts.dmSans(
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
+          const SizedBox(height: 40),
+          CustomTextField(
+            controller: _emailController,
+            label: 'Email Address',
+            hint: 'Enter your registered email',
+            keyboardType: TextInputType.emailAddress,
+            prefixIcon: const Icon(Icons.email_outlined),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your email';
+              }
+              if (!value.contains('@')) {
+                return 'Please enter a valid email';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 32),
+          CustomButton(
+            text: 'Send Reset Link',
+            onPressed: _sendResetEmail,
+            isLoading: authProvider.isLoading,
+          ),
+          const SizedBox(height: 24),
+          Center(
+            child: TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.arrow_back,
+                    size: 18,
+                    color: AppColors.warmOrange,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Back to Login',
+                    style: GoogleFonts.dmSans(
+                      color: AppColors.warmOrange,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
-      const SizedBox(height: 8),
-      Center(
-        child: Text(
-          'No worries, we\'ll send you reset instructions',
-        style: GoogleFonts.dmSans(
-          fontSize: 14,
-          color: Colors.grey.shade600,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    ),
-    const SizedBox(height: 40),
-    CustomTextField(
-    controller: _emailController,
-    label: 'Email Address',
-    hint: 'Enter your registered email',
-    keyboardType: TextInputType.emailAddress,
-    prefixIcon: Icons.email_outlined,
-    validator: (value) {
-    if (value == null || value.isEmpty) {
-    return 'Please enter your email';
-    }
-    if (!value.contains('@')) {
-    return 'Please enter a valid email';
-    }
-    return null;
-    },
-    ),
-    const SizedBox(height: 32),
-    CustomButton(
-    text: 'Send Reset Link',
-    onPressed: _sendResetEmail,
-    isLoading: authProvider.isLoading,
-    ),
-    const SizedBox(height: 24),
-    Center(
-    child: TextButton(
-    onPressed: () => Navigator.of(context).pop(),
-    child: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-    const Icon(
-    Icons.arrow_back,
-    size: 18,
-    color: AppColors.warmOrange,
-    ),
-    const SizedBox(width: 8),
-    Text(
-    'Back to Login',
-    style: GoogleFonts.dmSans(
-    color: AppColors.warmOrange,
-    fontWeight: FontWeight.w600,
-    ),
-    ),
-    ],
-    ),
-    ),
-    ),
-    ],
-    ),
     );
   }
 
@@ -174,7 +174,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Container(
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: Colors.green.withOpacity(0.1),
+            color: Colors.green.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -217,14 +217,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.goldenYellow.withOpacity(0.1),
+            color: AppColors.goldenYellow.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             children: [
               Icon(
                 Icons.info_outline,
-                color: AppColors.goldenYellow.withOpacity(0.8),
+                color: AppColors.goldenYellow.withValues(alpha: 0.8),
                 size: 24,
               ),
               const SizedBox(width: 12),
