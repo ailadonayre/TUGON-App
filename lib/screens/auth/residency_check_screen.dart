@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
 import '../../widgets/custom_button.dart';
-import '../../providers/user_provider.dart';
 import 'verification_required_screen.dart';
 import 'registration_form_screen.dart';
 

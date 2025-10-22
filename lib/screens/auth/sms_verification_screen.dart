@@ -5,7 +5,6 @@ import 'package:pinput/pinput.dart';
 import 'dart:async';
 import '../../utils/colors.dart';
 import '../../widgets/custom_button.dart';
-import '../../providers/user_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/auth_service.dart';
 import '../../models/user_model.dart';
