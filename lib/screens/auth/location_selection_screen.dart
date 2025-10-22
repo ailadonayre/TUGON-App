@@ -5,6 +5,7 @@ import '../../utils/colors.dart';
 import '../../widgets/custom_button.dart';
 import '../../models/barangay_model.dart';
 import '../../providers/user_provider.dart';
+import '../../services/location_service.dart';
 import 'residency_check_screen.dart';
 
 class LocationSelectionScreen extends StatefulWidget {
