@@ -8,12 +8,43 @@ import 'providers/user_provider.dart';
 import 'screens/onboarding/splash_screen.dart';
 import 'utils/colors.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(const MyApp());
+
+  // Safely initialize Firebase
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    runApp(const MyApp());
+  } catch (e, stack) {
+    // This helps identify Firebase setup issues during early runs
+    debugPrint('Firebase initialization failed: $e');
+    debugPrintStack(stackTrace: stack);
+
+    // Run a minimal fallback app to show an error message
+    runApp(const FirebaseErrorApp());
+  }
+}
+
+class FirebaseErrorApp extends StatelessWidget {
+  const FirebaseErrorApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Text(
+            'Failed to initialize Firebase.\nPlease check your configuration.',
+            style: TextStyle(color: Colors.red.shade700, fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {

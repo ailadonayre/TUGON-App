@@ -24,7 +24,7 @@ class PendingApprovalScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: AppColors.goldenYellow.withOpacity(0.2),
+                  color: AppColors.goldenYellow.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -87,7 +87,7 @@ class PendingApprovalScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.deepNavy.withOpacity(0.05),
+                  color: AppColors.deepNavy.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
@@ -137,7 +137,7 @@ class PendingApprovalScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppColors.warmOrange.withOpacity(0.1),
+            color: AppColors.warmOrange.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: AppColors.warmOrange, size: 20),
