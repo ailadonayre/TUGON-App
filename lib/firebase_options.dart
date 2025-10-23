@@ -89,4 +89,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'tugon-4e318.firebasestorage.app',
     measurementId: 'G-S3PKFH2GN3',
   );
+
 }
