@@ -56,3 +56,6 @@ app.*.map.json
 
 # VS Code config (optional, if you don’t want workspace settings committed)
 .vscode/
+
+# Firebase service account key
+tools/serviceAccountKey.json
