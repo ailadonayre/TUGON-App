@@ -7,9 +7,12 @@ import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
 import 'screens/onboarding/splash_screen.dart';
 import 'utils/colors.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load(fileName: ".env");
 
   // Safely initialize Firebase
   try {

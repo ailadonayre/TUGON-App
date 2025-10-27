@@ -66,8 +66,8 @@ class FirestoreService {
     }
   }
 
-  // Update phone verification status
-  Future<void> updatePhoneVerification(
+  // Update email verification status (CHANGED FROM PHONE)
+  Future<void> updateEmailVerification(
       String uid,
       LocationData location,
       bool verified,
@@ -80,9 +80,9 @@ class FirestoreService {
           .doc(barangayDocId)
           .collection('users')
           .doc(uid)
-          .update({'phoneVerified': verified});
+          .update({'emailVerified': verified}); // CHANGED
     } catch (e) {
-      throw Exception('Failed to update phone verification: ${e.toString()}');
+      throw Exception('Failed to update email verification: ${e.toString()}');
     }
   }
 
@@ -109,7 +109,6 @@ class FirestoreService {
   // Check if user is admin
   Future<bool> isUserAdmin(String uid) async {
     try {
-      // Search across all barangays
       final barangays = await _firestore.collection('barangays').get();
 
       for (var barangayDoc in barangays.docs) {
