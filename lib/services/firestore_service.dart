@@ -191,4 +191,141 @@ class FirestoreService {
       throw Exception('Failed to seed barangay documents: ${e.toString()}');
     }
   }
+  // Add these methods to your existing FirestoreService class
+
+// Get all users from a barangay
+  Future<List<UserModel>> getAllUsers(LocationData location) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      final snapshot = await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('users')
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => UserModel.fromMap(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get users: ${e.toString()}');
+    }
+  }
+
+// Get users by status
+  Future<List<UserModel>> getUsersByStatus(
+      LocationData location,
+      String status,
+      ) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      final snapshot = await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('users')
+          .where('status', isEqualTo: status)
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => UserModel.fromMap(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get users by status: ${e.toString()}');
+    }
+  }
+
+// Approve user
+  Future<void> approveUser(String uid, LocationData location) async {
+    try {
+      await updateUserStatus(uid, location, 'approved');
+    } catch (e) {
+      throw Exception('Failed to approve user: ${e.toString()}');
+    }
+  }
+
+// Reject user
+  Future<void> rejectUser(String uid, LocationData location) async {
+    try {
+      await updateUserStatus(uid, location, 'rejected');
+    } catch (e) {
+      throw Exception('Failed to reject user: ${e.toString()}');
+    }
+  }
+
+// Get user statistics
+  Future<Map<String, int>> getUserStatistics(LocationData location) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      final allUsers = await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('users')
+          .get();
+
+      int total = allUsers.docs.length;
+      int pending = 0;
+      int approved = 0;
+      int rejected = 0;
+
+      for (var doc in allUsers.docs) {
+        final status = doc.data()['status'] as String?;
+        switch (status) {
+          case 'pending_review':
+            pending++;
+            break;
+          case 'approved':
+            approved++;
+            break;
+          case 'rejected':
+            rejected++;
+            break;
+        }
+      }
+
+      return {
+        'total': total,
+        'pending': pending,
+        'approved': approved,
+        'rejected': rejected,
+      };
+    } catch (e) {
+      throw Exception('Failed to get statistics: ${e.toString()}');
+    }
+  }
+
+// Search users by name or email
+  Future<List<UserModel>> searchUsers(
+      LocationData location,
+      String query,
+      ) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      final snapshot = await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('users')
+          .get();
+
+      final allUsers = snapshot.docs
+          .map((doc) => UserModel.fromMap(doc.data(), doc.id))
+          .toList();
+
+      // Filter locally (Firestore doesn't support complex text search)
+      final filtered = allUsers.where((user) {
+        final nameLower = user.fullName.toLowerCase();
+        final emailLower = user.email.toLowerCase();
+        final queryLower = query.toLowerCase();
+        return nameLower.contains(queryLower) || emailLower.contains(queryLower);
+      }).toList();
+
+      return filtered;
+    } catch (e) {
+      throw Exception('Failed to search users: ${e.toString()}');
+    }
+  }
 }

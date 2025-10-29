@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
+import 'providers/admin_provider.dart';
 import 'screens/onboarding/splash_screen.dart';
 import 'utils/colors.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => AdminProvider()),
       ],
       child: MaterialApp(
         title: 'TUGON',

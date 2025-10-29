@@ -6,6 +6,7 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/custom_textfield.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
+import '../admin/admin_dashboard_screen.dart'; // Add this import
 
 class AdminLoginScreen extends StatefulWidget {
   const AdminLoginScreen({super.key});
@@ -47,20 +48,29 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             final isAdmin = await _firestoreService.isUserAdmin(user.uid);
 
             if (isAdmin) {
-              // Navigate to admin dashboard (will implement later)
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Admin login successful! Dashboard coming soon.'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              // Navigate to admin dashboard
+              if (mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AdminDashboardScreen(),
+                  ),
+                );
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('✅ Welcome Admin!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
             } else {
               // Not an admin - sign out
               await authProvider.signOut();
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Access denied. Admin privileges required.'),
+                    content: Text('❌ Access denied. Admin privileges required.'),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -70,7 +80,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(authProvider.error ?? 'Login failed'),
+              content: Text(authProvider.error ?? '❌ Login failed'),
               backgroundColor: Colors.red,
             ),
           );
