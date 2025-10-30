@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'email_code_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -9,7 +11,9 @@ class AuthService {
   User? get currentUser => _auth.currentUser;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
+  // -------------------------
   // Email & Password Sign Up
+  // -------------------------
   Future<UserCredential> signUpWithEmailPassword(
       String email,
       String password,
@@ -24,7 +28,9 @@ class AuthService {
     }
   }
 
+  // -------------------------
   // Email & Password Sign In
+  // -------------------------
   Future<UserCredential> signInWithEmailPassword(
       String email,
       String password,
@@ -39,36 +45,45 @@ class AuthService {
     }
   }
 
-  // Google Sign In
+  // -------------------------
+  // Google Sign In - CORRECTED FOR v7.2.0
+  // -------------------------
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount googleUser =
-      await GoogleSignIn.instance.authenticate(
-        scopeHint: const <String>['openid', 'email', 'profile'],
+      final String? webClientId = dotenv.env['GOOGLE_WEB_CLIENT_ID'];
+
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        clientId: webClientId, // optional for web; safe to include
+        scopes: ['email', 'profile'],
       );
 
+      // Trigger Google Sign-In flow
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) return null; // user cancelled
+
+      // Obtain authentication details
       final GoogleSignInAuthentication googleAuth =
       await googleUser.authentication;
 
-      final String? idToken = googleAuth.idToken;
-
-      if (idToken == null) {
-        throw Exception(
-            'Google sign-in succeeded but no ID token was returned.');
-      }
-
+      // Create Firebase credential
       final OAuthCredential credential = GoogleAuthProvider.credential(
-        idToken: idToken,
-        accessToken: null,
+        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken,
       );
 
-      return await _auth.signInWithCredential(credential);
-    } on Exception catch (e) {
-      throw Exception('Google sign in failed: ${e.toString()}');
+      // Sign in to Firebase
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e, st) {
+      print('Google Sign-In failed: $e\n$st');
+      throw Exception('Google Sign-In failed');
     }
   }
 
+
+
+  // -------------------------
   // Send verification code via email
+  // -------------------------
   Future<String> sendVerificationCode(String email) async {
     try {
       final code = await _emailCodeService.storeAndSendVerificationCode(email);
@@ -78,7 +93,9 @@ class AuthService {
     }
   }
 
+  // -------------------------
   // Verify the email code
+  // -------------------------
   Future<bool> verifyEmailCode(String email, String code) async {
     try {
       return await _emailCodeService.verifyCode(email, code);
@@ -87,7 +104,9 @@ class AuthService {
     }
   }
 
+  // -------------------------
   // Resend verification code
+  // -------------------------
   Future<String> resendVerificationCode(String email) async {
     try {
       return await _emailCodeService.resendCode(email);
@@ -96,7 +115,9 @@ class AuthService {
     }
   }
 
+  // -------------------------
   // Password reset
+  // -------------------------
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
@@ -105,19 +126,21 @@ class AuthService {
     }
   }
 
+  // -------------------------
   // Sign out
+  // -------------------------
   Future<void> signOut() async {
     try {
-      await Future.wait([
-        _auth.signOut(),
-        GoogleSignIn.instance.signOut(),
-      ]);
+      await _auth.signOut();
+      await GoogleSignIn().signOut();
     } catch (e) {
       await _auth.signOut();
     }
   }
 
+  // -------------------------
   // Exception handler
+  // -------------------------
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'weak-password':
