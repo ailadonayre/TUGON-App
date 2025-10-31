@@ -7,6 +7,7 @@ import '../../widgets/custom_textfield.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
 import '../admin/admin_dashboard_screen.dart'; // Add this import
+import 'pending_approval_screen.dart';
 
 class AdminLoginScreen extends StatefulWidget {
   const AdminLoginScreen({super.key});
@@ -29,62 +30,42 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     super.dispose();
   }
 
-  Future<void> _adminLogin() async {
+  Future<void> _signInWithEmail() async {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-      // Sign in with email and password
       final success = await authProvider.signInWithEmailPassword(
         _emailController.text.trim(),
         _passwordController.text,
       );
 
-      if (mounted) {
-        if (success) {
-          final user = authProvider.currentUser;
+      if (mounted && success) {
+        final user = authProvider.currentUser;
 
-          // Check if user is admin
-          if (user != null) {
-            final isAdmin = await _firestoreService.isUserAdmin(user.uid);
-
-            if (isAdmin) {
-              // Navigate to admin dashboard
-              if (mounted) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AdminDashboardScreen(),
-                  ),
-                );
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('✅ Welcome Admin!'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              }
-            } else {
-              // Not an admin - sign out
-              await authProvider.signOut();
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('❌ Access denied. Admin privileges required.'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            }
-          }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(authProvider.error ?? '❌ Login failed'),
-              backgroundColor: Colors.red,
-            ),
+        if (user?.isAdmin == true) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
           );
+        } else {
+          if (user?.status == 'approved') {
+            // TODO: Replace with your actual HomeScreen
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('✅ Login successful!')),
+            );
+          } else if (user?.status == 'pending_review') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const PendingApprovalScreen()),
+            );
+          }
         }
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authProvider.error ?? 'Login failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -224,7 +205,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 const SizedBox(height: 32),
                 CustomButton(
                   text: 'Login as Admin',
-                  onPressed: _adminLogin,
+                  onPressed: _signInWithEmail,
                   isLoading: authProvider.isLoading,
                 ),
                 const SizedBox(height: 20),
