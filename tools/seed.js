@@ -1,16 +1,3 @@
-// tools/seed.js
-/**
- * Firestore Seeder Script
- * -----------------------
- * This script seeds barangay data and a sample admin user into Firestore.
- *
- * Run using: node seed.js
- *
- * Make sure:
- * - You have a valid serviceAccountKey.json in the same directory.
- * - You’ve run `npm install firebase-admin` beforehand.
- */
-
 const admin = require("firebase-admin");
 const serviceAccount = require("./serviceAccountKey.json");
 
