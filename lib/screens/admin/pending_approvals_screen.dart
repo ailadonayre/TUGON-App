@@ -34,19 +34,36 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Approve User'),
-        content: Text('Approve ${user.fullName}?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Approve User',
+          style: GoogleFonts.dmSans(
+            fontWeight: FontWeight.bold,
+            color: AppColors.charcoalBlack,
+          ),
+        ),
+        content: Text(
+          'Approve ${user.fullName}?',
+          style: GoogleFonts.dmSans(color: AppColors.charcoalBlack),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.dmSans(color: AppColors.charcoalBlack),
+            ),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.brightBlue,
+              foregroundColor: AppColors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            child: Text('Approve'),
+            child: Text('Approve', style: GoogleFonts.dmSans()),
           ),
         ],
       ),
@@ -66,8 +83,13 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
           SnackBar(
             content: Text(
               success ? '✅ User approved!' : '❌ Failed to approve user',
+              style: GoogleFonts.dmSans(color: AppColors.white),
             ),
-            backgroundColor: success ? Colors.green : Colors.red,
+            backgroundColor: success ? AppColors.brightBlue : AppColors.coralRed,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
       }
@@ -78,19 +100,36 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Reject User'),
-        content: Text('Reject ${user.fullName}? This action cannot be undone.'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Reject User',
+          style: GoogleFonts.dmSans(
+            fontWeight: FontWeight.bold,
+            color: AppColors.charcoalBlack,
+          ),
+        ),
+        content: Text(
+          'Reject ${user.fullName}? This action cannot be undone.',
+          style: GoogleFonts.dmSans(color: AppColors.charcoalBlack),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.dmSans(color: AppColors.charcoalBlack),
+            ),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.coralRed,
+              foregroundColor: AppColors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            child: Text('Reject'),
+            child: Text('Reject', style: GoogleFonts.dmSans()),
           ),
         ],
       ),
@@ -110,8 +149,13 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
           SnackBar(
             content: Text(
               success ? '✅ User rejected' : '❌ Failed to reject user',
+              style: GoogleFonts.dmSans(color: AppColors.white),
             ),
-            backgroundColor: success ? Colors.orange : Colors.red,
+            backgroundColor: success ? AppColors.goldenYellow : AppColors.coralRed,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
       }
@@ -129,31 +173,51 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
           'Pending Approvals',
           style: GoogleFonts.dmSans(
             fontWeight: FontWeight.bold,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.softBlack),
+        iconTheme: const IconThemeData(color: AppColors.charcoalBlack),
       ),
       body: adminProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+        child: CircularProgressIndicator(
+          color: AppColors.brightBlue,
+        ),
+      )
           : pendingUsers.isEmpty
           ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.inbox,
-              size: 80,
-              color: Colors.grey.shade300,
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors.lightBlue,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.inbox,
+                size: 80,
+                color: AppColors.brightBlue.withValues(alpha: 0.5),
+              ),
             ),
             const SizedBox(height: 16),
             Text(
               'No pending approvals',
               style: GoogleFonts.dmSans(
                 fontSize: 18,
-                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w600,
+                color: AppColors.charcoalBlack,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'All caught up! 🎉',
+              style: GoogleFonts.dmSans(
+                fontSize: 14,
+                color: AppColors.charcoalBlack.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -161,6 +225,7 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
       )
           : RefreshIndicator(
         onRefresh: _loadPendingUsers,
+        color: AppColors.brightBlue,
         child: ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: pendingUsers.length,
@@ -178,7 +243,8 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: AppColors.goldenYellow.withValues(alpha: 0.3)),
       ),
       child: InkWell(
         onTap: () {
@@ -189,7 +255,7 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
             ),
           );
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -197,15 +263,27 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: AppColors.warmOrange.withValues(alpha: 0.1),
-                    child: Text(
-                      user.fullName[0].toUpperCase(),
-                      style: GoogleFonts.dmSans(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.warmOrange,
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.goldenYellow.withValues(alpha: 0.2),
+                          AppColors.goldenYellow.withValues(alpha: 0.1),
+                        ],
+                      ),
+                    ),
+                    child: CircleAvatar(
+                      radius: 28,
+                      backgroundColor: AppColors.goldenYellow.withValues(alpha: 0.2),
+                      child: Text(
+                        user.fullName[0].toUpperCase(),
+                        style: GoogleFonts.dmSans(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.goldenYellow,
+                        ),
                       ),
                     ),
                   ),
@@ -219,7 +297,7 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
                           style: GoogleFonts.dmSans(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.softBlack,
+                            color: AppColors.charcoalBlack,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -227,7 +305,7 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
                           user.email,
                           style: GoogleFonts.dmSans(
                             fontSize: 13,
-                            color: Colors.grey.shade600,
+                            color: AppColors.charcoalBlack.withValues(alpha: 0.6),
                           ),
                         ),
                       ],
@@ -239,22 +317,36 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withValues(alpha: 0.1),
+                      color: AppColors.goldenYellow.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'PENDING',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange,
+                      border: Border.all(
+                        color: AppColors.goldenYellow.withValues(alpha: 0.3),
                       ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.pending_actions,
+                          size: 14,
+                          color: AppColors.goldenYellow,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'PENDING',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.goldenYellow,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
-              const Divider(),
+              Divider(color: AppColors.charcoalBlack.withValues(alpha: 0.1)),
               const SizedBox(height: 8),
               _buildInfoRow(Icons.phone, user.phone),
               const SizedBox(height: 4),
@@ -270,10 +362,17 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () => _rejectUser(user),
                       icon: const Icon(Icons.close, size: 18),
-                      label: const Text('Reject'),
+                      label: Text(
+                        'Reject',
+                        style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
+                      ),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        side: const BorderSide(color: Colors.red),
+                        foregroundColor: AppColors.coralRed,
+                        side: BorderSide(color: AppColors.coralRed, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
@@ -282,10 +381,18 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () => _approveUser(user),
                       icon: const Icon(Icons.check, size: 18),
-                      label: const Text('Approve'),
+                      label: Text(
+                        'Approve',
+                        style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
+                      ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.brightBlue,
+                        foregroundColor: AppColors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
@@ -301,14 +408,18 @@ class _PendingApprovalsScreenState extends State<PendingApprovalsScreen> {
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Colors.grey.shade600),
+        Icon(
+          icon,
+          size: 16,
+          color: AppColors.brightBlue.withValues(alpha: 0.7),
+        ),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
             style: GoogleFonts.dmSans(
               fontSize: 13,
-              color: Colors.grey.shade700,
+              color: AppColors.charcoalBlack.withValues(alpha: 0.7),
             ),
           ),
         ),

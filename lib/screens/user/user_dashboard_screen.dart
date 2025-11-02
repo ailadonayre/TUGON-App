@@ -38,7 +38,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -84,12 +84,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             gradient: isSelected
                 ? AppColors.primaryGradient
                 : LinearGradient(
-              colors: [activeColor.withOpacity(0.8), activeColor],
+              colors: [activeColor.withValues(alpha: 0.8), activeColor],
             ),
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: (isSelected ? AppColors.coralRed : activeColor).withOpacity(0.4),
+                color: (isSelected ? AppColors.coralRed : activeColor).withValues(alpha: 0.4),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
               ),
@@ -113,7 +113,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           vertical: 8,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? activeColor.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? activeColor.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(

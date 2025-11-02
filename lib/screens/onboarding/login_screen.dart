@@ -191,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   borderRadius: BorderRadius.circular(24),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: Colors.black.withValues(alpha: 0.1),
                                       blurRadius: 20,
                                       offset: const Offset(0, 10),
                                     ),
@@ -219,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 'Welcome back!',
                                 style: GoogleFonts.dmSans(
                                   fontSize: 16,
-                                  color: AppColors.white.withOpacity(0.9),
+                                  color: AppColors.white.withValues(alpha: 0.9),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),

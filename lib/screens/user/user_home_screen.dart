@@ -13,7 +13,7 @@ class UserHomeScreen extends StatelessWidget {
           'Home',
           style: GoogleFonts.dmSans(
             fontWeight: FontWeight.bold,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
         backgroundColor: Colors.white,

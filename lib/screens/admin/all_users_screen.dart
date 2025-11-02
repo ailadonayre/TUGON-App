@@ -80,12 +80,12 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
           'All Users',
           style: GoogleFonts.dmSans(
             fontWeight: FontWeight.bold,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.softBlack),
+        iconTheme: const IconThemeData(color: AppColors.charcoalBlack),
       ),
       body: Column(
         children: [
@@ -97,11 +97,13 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
               onChanged: _searchUsers,
               decoration: InputDecoration(
                 hintText: 'Search by name or email...',
-                hintStyle: GoogleFonts.dmSans(color: Colors.grey.shade500),
-                prefixIcon: const Icon(Icons.search, color: AppColors.warmOrange),
+                hintStyle: GoogleFonts.dmSans(
+                  color: AppColors.charcoalBlack.withValues(alpha: 0.4),
+                ),
+                prefixIcon: const Icon(Icons.search, color: AppColors.brightBlue),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                  icon: const Icon(Icons.clear),
+                  icon: const Icon(Icons.clear, color: AppColors.coralRed),
                   onPressed: () {
                     _searchController.clear();
                     _loadUsers();
@@ -109,10 +111,14 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                 )
                     : null,
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: AppColors.lightBlue,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.brightBlue, width: 2),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -144,7 +150,11 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
           // User List
           Expanded(
             child: adminProvider.isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(
+              child: CircularProgressIndicator(
+                color: AppColors.brightBlue,
+              ),
+            )
                 : users.isEmpty
                 ? Center(
               child: Column(
@@ -153,14 +163,14 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                   Icon(
                     Icons.search_off,
                     size: 80,
-                    color: Colors.grey.shade300,
+                    color: AppColors.charcoalBlack.withValues(alpha: 0.2),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No users found',
                     style: GoogleFonts.dmSans(
                       fontSize: 18,
-                      color: Colors.grey.shade600,
+                      color: AppColors.charcoalBlack.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -168,6 +178,7 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
             )
                 : RefreshIndicator(
               onRefresh: _loadUsers,
+              color: AppColors.brightBlue,
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: users.length,
@@ -185,17 +196,36 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
 
   Widget _buildFilterChip(String label, String value) {
     final isSelected = _selectedFilter == value;
+    Color chipColor;
+
+    switch (value) {
+      case 'pending_review':
+        chipColor = AppColors.goldenYellow;
+        break;
+      case 'approved':
+        chipColor = AppColors.brightBlue;
+        break;
+      case 'rejected':
+        chipColor = AppColors.coralRed;
+        break;
+      default:
+        chipColor = AppColors.charcoalBlack;
+    }
+
     return FilterChip(
       label: Text(label),
       selected: isSelected,
       onSelected: (_) => _filterUsers(value),
       labelStyle: GoogleFonts.dmSans(
         fontWeight: FontWeight.w600,
-        color: isSelected ? Colors.white : AppColors.softBlack,
+        color: isSelected ? AppColors.white : AppColors.charcoalBlack,
       ),
-      backgroundColor: Colors.grey.shade200,
-      selectedColor: AppColors.warmOrange,
-      checkmarkColor: Colors.white,
+      backgroundColor: AppColors.lightBlue,
+      selectedColor: chipColor,
+      checkmarkColor: AppColors.white,
+      side: BorderSide(
+        color: isSelected ? chipColor : AppColors.charcoalBlack.withValues(alpha: 0.2),
+      ),
     );
   }
 
@@ -205,27 +235,28 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
 
     switch (user.status) {
       case 'approved':
-        statusColor = Colors.green;
+        statusColor = AppColors.brightBlue;
         statusLabel = 'APPROVED';
         break;
       case 'rejected':
-        statusColor = Colors.red;
+        statusColor = AppColors.coralRed;
         statusLabel = 'REJECTED';
         break;
       case 'pending_review':
-        statusColor = Colors.orange;
+        statusColor = AppColors.goldenYellow;
         statusLabel = 'PENDING';
         break;
       default:
-        statusColor = Colors.grey;
+        statusColor = AppColors.charcoalBlack;
         statusLabel = 'PARTIAL';
     }
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 1,
+      elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: statusColor.withValues(alpha: 0.2)),
       ),
       child: InkWell(
         onTap: () {
@@ -243,13 +274,13 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: AppColors.warmOrange.withValues(alpha: 0.1),
+                backgroundColor: statusColor.withValues(alpha: 0.15),
                 child: Text(
                   user.fullName[0].toUpperCase(),
                   style: GoogleFonts.dmSans(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.warmOrange,
+                    color: statusColor,
                   ),
                 ),
               ),
@@ -263,7 +294,7 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                       style: GoogleFonts.dmSans(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.softBlack,
+                        color: AppColors.charcoalBlack,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -271,20 +302,24 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                       user.email,
                       style: GoogleFonts.dmSans(
                         fontSize: 12,
-                        color: Colors.grey.shade600,
+                        color: AppColors.charcoalBlack.withValues(alpha: 0.6),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.phone, size: 12, color: Colors.grey.shade500),
+                        Icon(
+                          Icons.phone,
+                          size: 12,
+                          color: AppColors.charcoalBlack.withValues(alpha: 0.5),
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           user.phone,
                           style: GoogleFonts.dmSans(
                             fontSize: 11,
-                            color: Colors.grey.shade600,
+                            color: AppColors.charcoalBlack.withValues(alpha: 0.6),
                           ),
                         ),
                       ],
@@ -301,8 +336,9 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.1),
+                      color: statusColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       statusLabel,
@@ -317,7 +353,7 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                   Icon(
                     Icons.arrow_forward_ios,
                     size: 14,
-                    color: Colors.grey.shade400,
+                    color: statusColor.withValues(alpha: 0.5),
                   ),
                 ],
               ),

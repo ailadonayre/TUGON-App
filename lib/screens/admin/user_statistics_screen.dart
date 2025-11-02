@@ -44,21 +44,24 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
           'User Statistics',
           style: GoogleFonts.dmSans(
             fontWeight: FontWeight.bold,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.softBlack),
+        iconTheme: const IconThemeData(color: AppColors.charcoalBlack),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadStatistics,
+            tooltip: 'Refresh',
           ),
         ],
       ),
+      backgroundColor: AppColors.lightBlue,
       body: RefreshIndicator(
         onRefresh: _loadStatistics,
+        color: AppColors.brightBlue,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(20),
@@ -70,17 +73,29 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.warmOrange, Color(0xFFF7931E)],
-                  ),
+                  gradient: AppColors.primaryGradient,
                   borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.brightBlue.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
                 child: Column(
                   children: [
-                    const Icon(
-                      Icons.people,
-                      size: 60,
-                      color: Colors.white,
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(
+                        Icons.people,
+                        size: 60,
+                        color: AppColors.white,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -88,14 +103,15 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
                       style: GoogleFonts.dmSans(
                         fontSize: 48,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     ),
                     Text(
                       'Total Users',
                       style: GoogleFonts.dmSans(
                         fontSize: 18,
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: AppColors.white.withValues(alpha: 0.9),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -110,7 +126,7 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
                 style: GoogleFonts.dmSans(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.softBlack,
+                  color: AppColors.charcoalBlack,
                 ),
               ),
               const SizedBox(height: 16),
@@ -120,7 +136,7 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
                 pending,
                 total,
                 Icons.pending_actions,
-                Colors.orange,
+                AppColors.goldenYellow,
               ),
               const SizedBox(height: 12),
 
@@ -138,7 +154,7 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
                 rejected,
                 total,
                 Icons.cancel,
-                Colors.red,
+                AppColors.coralRed,
               ),
 
               const SizedBox(height: 32),
@@ -149,7 +165,7 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
                 style: GoogleFonts.dmSans(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.softBlack,
+                  color: AppColors.charcoalBlack,
                 ),
               ),
               const SizedBox(height: 16),
@@ -162,63 +178,122 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.blue.shade100),
+                  border: Border.all(color: AppColors.brightBlue.withValues(alpha: 0.3), width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.brightBlue.withValues(alpha: 0.1),
+                      blurRadius: 15,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.lightbulb, color: Colors.blue.shade700),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.lightYellow,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.lightbulb,
+                            color: AppColors.goldenYellow,
+                            size: 24,
+                          ),
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Insights',
                           style: GoogleFonts.dmSans(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade900,
+                            color: AppColors.charcoalBlack,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
                     if (pending > 0)
-                      Text(
-                        '• You have $pending user${pending > 1 ? 's' : ''} waiting for approval',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 14,
-                          color: Colors.blue.shade800,
-                          height: 1.5,
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('• ', style: TextStyle(fontSize: 14)),
+                            Expanded(
+                              child: Text(
+                                'You have $pending user${pending > 1 ? 's' : ''} waiting for approval',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 14,
+                                  color: AppColors.charcoalBlack,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     if (approved > 0)
-                      Text(
-                        '• ${_calculatePercentage(approved, total)}% of users are approved',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 14,
-                          color: Colors.blue.shade800,
-                          height: 1.5,
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('• ', style: TextStyle(fontSize: 14)),
+                            Expanded(
+                              child: Text(
+                                '${_calculatePercentage(approved, total)}% of users are approved',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 14,
+                                  color: AppColors.charcoalBlack,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     if (rejected > 0)
-                      Text(
-                        '• ${_calculatePercentage(rejected, total)}% of users were rejected',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 14,
-                          color: Colors.blue.shade800,
-                          height: 1.5,
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('• ', style: TextStyle(fontSize: 14)),
+                            Expanded(
+                              child: Text(
+                                '${_calculatePercentage(rejected, total)}% of users were rejected',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 14,
+                                  color: AppColors.charcoalBlack,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     if (total == 0)
-                      Text(
-                        '• No users registered yet',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 14,
-                          color: Colors.blue.shade800,
-                          height: 1.5,
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('• ', style: TextStyle(fontSize: 14)),
+                          Expanded(
+                            child: Text(
+                              'No users registered yet',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 14,
+                                color: AppColors.charcoalBlack,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                   ],
                 ),
@@ -242,13 +317,13 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
+            color: color.withValues(alpha: 0.15),
+            blurRadius: 15,
             offset: const Offset(0, 4),
           ),
         ],
@@ -273,6 +348,7 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
                   style: GoogleFonts.dmSans(
                     fontSize: 14,
                     color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -295,6 +371,7 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
                         style: GoogleFonts.dmSans(
                           fontSize: 14,
                           color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -311,11 +388,11 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
   Widget _buildProgressBars(int pending, int approved, int rejected, int total) {
     return Column(
       children: [
-        _buildProgressBar('Pending', pending, total, Colors.orange),
+        _buildProgressBar('Pending', pending, total, AppColors.goldenYellow),
         const SizedBox(height: 12),
         _buildProgressBar('Approved', approved, total, Colors.green),
         const SizedBox(height: 12),
-        _buildProgressBar('Rejected', rejected, total, Colors.red),
+        _buildProgressBar('Rejected', rejected, total, AppColors.coralRed),
       ],
     );
   }
@@ -323,40 +400,55 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
   Widget _buildProgressBar(String label, int count, int total, Color color) {
     final percentage = total > 0 ? count / total : 0.0;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: GoogleFonts.dmSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.softBlack,
-              ),
-            ),
-            Text(
-              '$count / $total',
-              style: GoogleFonts.dmSans(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: LinearProgressIndicator(
-            value: percentage,
-            minHeight: 12,
-            backgroundColor: Colors.grey.shade200,
-            valueColor: AlwaysStoppedAnimation<Color>(color),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
-        ),
-      ],
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.dmSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.charcoalBlack,
+                ),
+              ),
+              Text(
+                '$count / $total',
+                style: GoogleFonts.dmSans(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: LinearProgressIndicator(
+              value: percentage,
+              minHeight: 12,
+              backgroundColor: Colors.grey.shade200,
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

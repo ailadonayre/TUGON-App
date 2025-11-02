@@ -52,7 +52,7 @@ class CustomButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           elevation: 3,
-          shadowColor: buttonColor.withOpacity(0.4),
+          shadowColor: buttonColor.withValues(alpha: 0.4),
         ),
         child: _buildChild(buttonTextColor),
       ),

@@ -13,7 +13,7 @@ class UserReportScreen extends StatelessWidget {
           'Report Incident',
           style: GoogleFonts.dmSans(
             fontWeight: FontWeight.bold,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
         backgroundColor: Colors.white,
@@ -23,7 +23,7 @@ class UserReportScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add_circle_outline, size: 80, color: AppColors.warmOrange),
+            Icon(Icons.add_circle_outline, size: 80, color: AppColors.coralRed),
             const SizedBox(height: 16),
             Text(
               'Report Screen',

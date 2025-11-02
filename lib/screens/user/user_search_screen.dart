@@ -13,7 +13,7 @@ class UserSearchScreen extends StatelessWidget {
           'Search',
           style: GoogleFonts.dmSans(
             fontWeight: FontWeight.bold,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
         backgroundColor: Colors.white,

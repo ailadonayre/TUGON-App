@@ -116,7 +116,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.brightBlue.withOpacity(0.3),
+                          color: AppColors.brightBlue.withValues(alpha: 0.3),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),
@@ -154,10 +154,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: AppColors.goldenYellow.withOpacity(0.1),
+                    color: AppColors.goldenYellow.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: AppColors.goldenYellow.withOpacity(0.3),
+                      color: AppColors.goldenYellow.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(

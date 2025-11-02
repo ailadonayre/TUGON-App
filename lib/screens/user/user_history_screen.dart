@@ -13,7 +13,7 @@ class UserHistoryScreen extends StatelessWidget {
           'History',
           style: GoogleFonts.dmSans(
             fontWeight: FontWeight.bold,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
         backgroundColor: Colors.white,

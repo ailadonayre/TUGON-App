@@ -30,7 +30,7 @@ class UserDetailScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.warmOrange,
+              backgroundColor: AppColors.coralRed,
             ),
             child: Text('Confirm'),
           ),
@@ -69,7 +69,7 @@ class UserDetailScreen extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('❌ Failed to update status'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.coralRed,
             ),
           );
         }
@@ -88,11 +88,11 @@ class UserDetailScreen extends StatelessWidget {
         statusIcon = Icons.check_circle;
         break;
       case 'rejected':
-        statusColor = Colors.red;
+        statusColor = AppColors.coralRed;
         statusIcon = Icons.cancel;
         break;
       case 'pending_review':
-        statusColor = Colors.orange;
+        statusColor = AppColors.goldenYellow;
         statusIcon = Icons.pending_actions;
         break;
       default:
@@ -106,13 +106,14 @@ class UserDetailScreen extends StatelessWidget {
           'User Details',
           style: GoogleFonts.dmSans(
             fontWeight: FontWeight.bold,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.softBlack),
+        iconTheme: const IconThemeData(color: AppColors.charcoalBlack),
       ),
+      backgroundColor: AppColors.lightBlue,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -121,22 +122,27 @@ class UserDetailScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.warmOrange, Color(0xFFF7931E)],
-                ),
+                gradient: AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.brightBlue.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
               child: Column(
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundColor: Colors.white,
+                    backgroundColor: AppColors.white,
                     child: Text(
                       user.fullName[0].toUpperCase(),
                       style: GoogleFonts.dmSans(
                         fontSize: 48,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.warmOrange,
+                        color: AppColors.brightBlue,
                       ),
                     ),
                   ),
@@ -146,7 +152,7 @@ class UserDetailScreen extends StatelessWidget {
                     style: GoogleFonts.dmSans(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -159,18 +165,25 @@ class UserDetailScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: statusColor,
                       borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: statusColor.withValues(alpha: 0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(statusIcon, color: Colors.white, size: 16),
+                        Icon(statusIcon, color: AppColors.white, size: 16),
                         const SizedBox(width: 6),
                         Text(
                           user.status.toUpperCase().replaceAll('_', ' '),
                           style: GoogleFonts.dmSans(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: AppColors.white,
                           ),
                         ),
                       ],
@@ -245,9 +258,12 @@ class UserDetailScreen extends StatelessWidget {
                       icon: const Icon(Icons.close),
                       label: const Text('Reject'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        side: const BorderSide(color: Colors.red),
+                        foregroundColor: AppColors.coralRed,
+                        side: const BorderSide(color: AppColors.coralRed, width: 2),
                         padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),
@@ -259,8 +275,12 @@ class UserDetailScreen extends StatelessWidget {
                       label: const Text('Approve'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
+                        foregroundColor: AppColors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),
@@ -276,12 +296,12 @@ class UserDetailScreen extends StatelessWidget {
   Widget _buildSection(String title, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 15,
             offset: const Offset(0, 4),
           ),
         ],
@@ -296,11 +316,11 @@ class UserDetailScreen extends StatelessWidget {
               style: GoogleFonts.dmSans(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.softBlack,
+                color: AppColors.charcoalBlack,
               ),
             ),
           ),
-          const Divider(height: 1),
+          Divider(height: 1, color: AppColors.lightBlue),
           ...children,
         ],
       ),
@@ -312,7 +332,14 @@ class UserDetailScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppColors.warmOrange),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.lightBlue,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 20, color: AppColors.brightBlue),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -331,7 +358,7 @@ class UserDetailScreen extends StatelessWidget {
                   style: GoogleFonts.dmSans(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.softBlack,
+                    color: AppColors.charcoalBlack,
                   ),
                 ),
               ],
@@ -347,10 +374,17 @@ class UserDetailScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          Icon(
-            isVerified ? Icons.check_circle : Icons.cancel,
-            size: 20,
-            color: isVerified ? Colors.green : Colors.red,
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isVerified ? Colors.green.withValues(alpha: 0.1) : AppColors.lightRed,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              isVerified ? Icons.check_circle : Icons.cancel,
+              size: 20,
+              color: isVerified ? Colors.green : AppColors.coralRed,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -358,7 +392,7 @@ class UserDetailScreen extends StatelessWidget {
               label,
               style: GoogleFonts.dmSans(
                 fontSize: 15,
-                color: AppColors.softBlack,
+                color: AppColors.charcoalBlack,
               ),
             ),
           ),
@@ -367,15 +401,19 @@ class UserDetailScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: isVerified
                   ? Colors.green.withValues(alpha: 0.1)
-                  : Colors.red.withValues(alpha: 0.1),
+                  : AppColors.lightRed,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isVerified ? Colors.green : AppColors.coralRed,
+                width: 1,
+              ),
             ),
             child: Text(
               isVerified ? 'Verified' : 'Not Verified',
               style: GoogleFonts.dmSans(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isVerified ? Colors.green : Colors.red,
+                color: isVerified ? Colors.green : AppColors.coralRed,
               ),
             ),
           ),

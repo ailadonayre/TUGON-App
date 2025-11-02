@@ -82,7 +82,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.brightBlue.withOpacity(0.3),
+                      color: AppColors.brightBlue.withValues(alpha: 0.3),
                       blurRadius: 15,
                       offset: const Offset(0, 8),
                     ),
@@ -97,7 +97,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -127,7 +127,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             authProvider.currentUser?.location.barangay ?? '',
                             style: GoogleFonts.dmSans(
                               fontSize: 14,
-                              color: AppColors.white.withOpacity(0.9),
+                              color: AppColors.white.withValues(alpha: 0.9),
                             ),
                           ),
                         ],
@@ -174,7 +174,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     'Approved',
                     stats['approved']?.toString() ?? '0',
                     Icons.check_circle_rounded,
-                    Colors.green,
+                    AppColors.brightBlue,
                   ),
                   _buildStatCard(
                     'Rejected',
@@ -263,12 +263,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -280,7 +280,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 32, color: color),
@@ -300,7 +300,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             style: GoogleFonts.dmSans(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.charcoalBlack.withOpacity(0.7),
+              color: AppColors.charcoalBlack.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -325,10 +325,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade100),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: color.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -339,7 +339,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
+                color: color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(icon, color: color, size: 26),
@@ -387,7 +387,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     subtitle,
                     style: GoogleFonts.dmSans(
                       fontSize: 12,
-                      color: Colors.grey.shade600,
+                      color: AppColors.charcoalBlack.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -396,7 +396,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             Icon(
               Icons.arrow_forward_ios_rounded,
               size: 16,
-              color: Colors.grey.shade400,
+              color: color.withValues(alpha: 0.5),
             ),
           ],
         ),

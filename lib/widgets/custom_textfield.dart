@@ -45,7 +45,7 @@ class CustomTextField extends StatelessWidget {
           style: GoogleFonts.dmSans(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
         const SizedBox(height: 8),
@@ -61,7 +61,7 @@ class CustomTextField extends StatelessWidget {
           maxLines: maxLines,
           style: GoogleFonts.dmSans(
             fontSize: 16,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
           decoration: InputDecoration(
             hintText: hint,
@@ -83,7 +83,7 @@ class CustomTextField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.warmOrange, width: 2),
+              borderSide: const BorderSide(color: AppColors.coralRed, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
