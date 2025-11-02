@@ -41,7 +41,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(authProvider.error ?? 'Failed to send reset email'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.coralRed,
             ),
           );
         }
@@ -54,11 +54,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.softBlack),
+          icon: const Icon(Icons.arrow_back, color: AppColors.charcoalBlack),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -82,13 +83,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.warmOrange.withValues(alpha: 0.1),
+                color: AppColors.lightBlue,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.lock_reset,
                 size: 60,
-                color: AppColors.warmOrange,
+                color: AppColors.brightBlue,
               ),
             ),
           ),
@@ -99,7 +100,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               style: GoogleFonts.dmSans(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: AppColors.softBlack,
+                color: AppColors.charcoalBlack,
               ),
             ),
           ),
@@ -147,13 +148,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   const Icon(
                     Icons.arrow_back,
                     size: 18,
-                    color: AppColors.warmOrange,
+                    color: AppColors.brightBlue,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Back to Login',
                     style: GoogleFonts.dmSans(
-                      color: AppColors.warmOrange,
+                      color: AppColors.brightBlue,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -189,7 +190,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           style: GoogleFonts.dmSans(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
         const SizedBox(height: 16),
@@ -210,21 +211,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           style: GoogleFonts.dmSans(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: AppColors.deepNavy,
+            color: AppColors.brightBlue,
           ),
         ),
         const SizedBox(height: 32),
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.goldenYellow.withValues(alpha: 0.1),
+            color: AppColors.lightYellow,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.info_outline,
-                color: AppColors.goldenYellow.withValues(alpha: 0.8),
+                color: AppColors.goldenYellow,
                 size: 24,
               ),
               const SizedBox(width: 12),
@@ -233,7 +234,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   'Please check your spam folder if you don\'t see the email within a few minutes.',
                   style: GoogleFonts.dmSans(
                     fontSize: 13,
-                    color: AppColors.softBlack,
+                    color: AppColors.charcoalBlack,
                     height: 1.4,
                   ),
                 ),
@@ -256,7 +257,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: Text(
             'Try another email',
             style: GoogleFonts.dmSans(
-              color: AppColors.warmOrange,
+              color: AppColors.brightBlue,
               fontWeight: FontWeight.w600,
             ),
           ),

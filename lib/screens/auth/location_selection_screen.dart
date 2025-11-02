@@ -77,11 +77,12 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
         _selectedBarangay != null;
 
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.softBlack),
+          icon: const Icon(Icons.arrow_back, color: AppColors.charcoalBlack),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -96,7 +97,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                 style: GoogleFonts.dmSans(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.softBlack,
+                  color: AppColors.charcoalBlack,
                 ),
               ),
               const SizedBox(height: 8),
@@ -113,7 +114,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                 value: 0.25,
                 backgroundColor: Colors.grey.shade200,
                 valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.warmOrange,
+                  AppColors.brightBlue,
                 ),
               ),
               const SizedBox(height: 32),
@@ -164,7 +165,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
               CustomButton(
                 text: 'Continue',
                 onPressed: canContinue ? _continue : () {},
-                color: canContinue ? AppColors.warmOrange : Colors.grey,
+                color: canContinue ? AppColors.brightBlue : Colors.grey,
               ),
             ],
           ),
@@ -189,18 +190,18 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
           style: GoogleFonts.dmSans(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: enabled ? Colors.white : Colors.grey.shade100,
+            color: enabled ? AppColors.white : Colors.grey.shade100,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.grey.shade300),
           ),
           child: DropdownButtonFormField<String>(
-            value: value,
+            initialValue: value,
             hint: Text(hint),
             isExpanded: true,
             decoration: const InputDecoration(
@@ -212,7 +213,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
             ),
             style: GoogleFonts.dmSans(
               fontSize: 16,
-              color: AppColors.softBlack,
+              color: AppColors.charcoalBlack,
             ),
             icon: const Icon(Icons.keyboard_arrow_down),
             items: items.map((String item) {

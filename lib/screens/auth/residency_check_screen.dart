@@ -35,11 +35,12 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.softBlack),
+          icon: const Icon(Icons.arrow_back, color: AppColors.charcoalBlack),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -54,7 +55,7 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
                 style: GoogleFonts.dmSans(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.softBlack,
+                  color: AppColors.charcoalBlack,
                 ),
               ),
               const SizedBox(height: 8),
@@ -71,7 +72,7 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
                 value: 0.5,
                 backgroundColor: Colors.grey.shade200,
                 valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.warmOrange,
+                  AppColors.brightBlue,
                 ),
               ),
               const SizedBox(height: 32),
@@ -83,20 +84,17 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: AppColors.goldenYellow
-                              .withValues(alpha: 0.1),
+                          color: AppColors.lightYellow,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppColors.goldenYellow
-                                .withValues(alpha: 0.3),
+                            color: AppColors.goldenYellow.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.info_outline,
-                              color: AppColors.goldenYellow
-                                  .withValues(alpha: 0.8),
+                              color: AppColors.goldenYellow,
                               size: 28,
                             ),
                             const SizedBox(width: 16),
@@ -105,7 +103,7 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
                                 'To proceed with registration, you must be a registered resident of the selected barangay.',
                                 style: GoogleFonts.dmSans(
                                   fontSize: 14,
-                                  color: AppColors.softBlack,
+                                  color: AppColors.charcoalBlack,
                                   height: 1.5,
                                 ),
                               ),
@@ -119,7 +117,7 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
                         style: GoogleFonts.dmSans(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.softBlack,
+                          color: AppColors.charcoalBlack,
                           height: 1.4,
                         ),
                       ),
@@ -173,12 +171,12 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.warmOrange.withValues(alpha: 0.1)
-              : Colors.white,
+              ? AppColors.lightBlue
+              : AppColors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
-                ? AppColors.warmOrange
+                ? AppColors.brightBlue
                 : Colors.grey.shade300,
             width: isSelected ? 2 : 1,
           ),
@@ -189,13 +187,13 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.warmOrange
+                    ? AppColors.brightBlue
                     : Colors.grey.shade200,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: isSelected ? Colors.white : Colors.grey.shade600,
+                color: isSelected ? AppColors.white : Colors.grey.shade600,
                 size: 24,
               ),
             ),
@@ -209,7 +207,7 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
                     style: GoogleFonts.dmSans(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.softBlack,
+                      color: AppColors.charcoalBlack,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -227,7 +225,7 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
             if (isSelected)
               const Icon(
                 Icons.check_circle,
-                color: AppColors.warmOrange,
+                color: AppColors.brightBlue,
                 size: 28,
               ),
           ],

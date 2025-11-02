@@ -10,11 +10,12 @@ class VerificationRequiredScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.softBlack),
+          icon: const Icon(Icons.arrow_back, color: AppColors.charcoalBlack),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -32,7 +33,7 @@ class VerificationRequiredScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(32),
                         decoration: BoxDecoration(
-                          color: AppColors.goldenYellow.withValues(alpha: 0.2),
+                          color: AppColors.lightYellow,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -47,7 +48,7 @@ class VerificationRequiredScreen extends StatelessWidget {
                         style: GoogleFonts.dmSans(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.softBlack,
+                          color: AppColors.charcoalBlack,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -64,7 +65,7 @@ class VerificationRequiredScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: Colors.grey.shade200),
                         ),
@@ -76,12 +77,12 @@ class VerificationRequiredScreen extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: AppColors.deepNavy.withValues(alpha: 0.1),
+                                    color: AppColors.lightBlue,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: const Icon(
                                     Icons.checklist,
-                                    color: AppColors.deepNavy,
+                                    color: AppColors.brightBlue,
                                     size: 24,
                                   ),
                                 ),
@@ -91,7 +92,7 @@ class VerificationRequiredScreen extends StatelessWidget {
                                   style: GoogleFonts.dmSans(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.softBlack,
+                                    color: AppColors.charcoalBlack,
                                   ),
                                 ),
                               ],
@@ -118,10 +119,10 @@ class VerificationRequiredScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: AppColors.warmOrange.withValues(alpha: 0.1),
+                          color: AppColors.lightRed,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: AppColors.warmOrange.withValues(alpha: 0.3),
+                            color: AppColors.coralRed.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Column(
@@ -131,7 +132,7 @@ class VerificationRequiredScreen extends StatelessWidget {
                               children: [
                                 const Icon(
                                   Icons.location_on,
-                                  color: AppColors.warmOrange,
+                                  color: AppColors.coralRed,
                                   size: 20,
                                 ),
                                 const SizedBox(width: 8),
@@ -140,7 +141,7 @@ class VerificationRequiredScreen extends StatelessWidget {
                                   style: GoogleFonts.dmSans(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.softBlack,
+                                    color: AppColors.charcoalBlack,
                                   ),
                                 ),
                               ],
@@ -150,7 +151,7 @@ class VerificationRequiredScreen extends StatelessWidget {
                               'Please visit your barangay hall during office hours (Mon-Fri, 8AM-5PM) to submit your documents and complete the verification process.',
                               style: GoogleFonts.dmSans(
                                 fontSize: 14,
-                                color: AppColors.softBlack,
+                                color: AppColors.charcoalBlack,
                                 height: 1.5,
                               ),
                             ),
@@ -158,14 +159,14 @@ class VerificationRequiredScreen extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 children: [
                                   const Icon(
                                     Icons.access_time,
-                                    color: AppColors.deepNavy,
+                                    color: AppColors.brightBlue,
                                     size: 18,
                                   ),
                                   const SizedBox(width: 8),
@@ -174,7 +175,7 @@ class VerificationRequiredScreen extends StatelessWidget {
                                     style: GoogleFonts.dmSans(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: AppColors.deepNavy,
+                                      color: AppColors.brightBlue,
                                     ),
                                   ),
                                 ],
@@ -212,13 +213,13 @@ class VerificationRequiredScreen extends StatelessWidget {
           margin: const EdgeInsets.only(top: 2),
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: AppColors.warmOrange.withValues(alpha: 0.2),
+            color: AppColors.lightBlue,
             shape: BoxShape.circle,
           ),
           child: const Icon(
             Icons.check,
             size: 16,
-            color: AppColors.warmOrange,
+            color: AppColors.brightBlue,
           ),
         ),
         const SizedBox(width: 12),
@@ -231,7 +232,7 @@ class VerificationRequiredScreen extends StatelessWidget {
                 style: GoogleFonts.dmSans(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.softBlack,
+                  color: AppColors.charcoalBlack,
                 ),
               ),
               const SizedBox(height: 2),

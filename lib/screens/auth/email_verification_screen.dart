@@ -91,7 +91,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.coralRed,
           ),
         );
       }
@@ -113,7 +113,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.warmOrange.withValues(alpha: 0.1),
+                color: AppColors.lightBlue,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -121,7 +121,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 style: GoogleFonts.dmSans(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.warmOrange,
+                  color: AppColors.brightBlue,
                   letterSpacing: 8,
                 ),
               ),
@@ -147,9 +147,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Future<void> _verifyCode() async {
     if (_pinController.text.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Please enter a 6-digit code'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.coralRed,
         ),
       );
       return;
@@ -199,7 +199,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(authProvider.error ?? 'Failed to create user'),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.coralRed,
               ),
             );
           }
@@ -207,9 +207,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('❌ Invalid or expired code'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.coralRed,
             ),
           );
         }
@@ -219,7 +219,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Verification failed: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.coralRed,
           ),
         );
       }
@@ -241,21 +241,22 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       textStyle: GoogleFonts.dmSans(
         fontSize: 24,
         fontWeight: FontWeight.w600,
-        color: AppColors.softBlack,
+        color: AppColors.charcoalBlack,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
       ),
     );
 
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.softBlack),
+          icon: const Icon(Icons.arrow_back, color: AppColors.charcoalBlack),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -270,7 +271,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 style: GoogleFonts.dmSans(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.softBlack,
+                  color: AppColors.charcoalBlack,
                 ),
               ),
               const SizedBox(height: 8),
@@ -287,7 +288,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 value: 1.0,
                 backgroundColor: Colors.grey.shade200,
                 valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.warmOrange,
+                  AppColors.brightBlue,
                 ),
               ),
               const SizedBox(height: 32),
@@ -299,13 +300,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: AppColors.warmOrange.withValues(alpha: 0.1),
+                          color: AppColors.lightBlue,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.email_outlined,
                           size: 60,
-                          color: AppColors.warmOrange,
+                          color: AppColors.brightBlue,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -322,7 +323,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         style: GoogleFonts.dmSans(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.softBlack,
+                          color: AppColors.charcoalBlack,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -334,7 +335,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         focusedPinTheme: defaultPinTheme.copyWith(
                           decoration: defaultPinTheme.decoration!.copyWith(
                             border: Border.all(
-                              color: AppColors.warmOrange,
+                              color: AppColors.brightBlue,
                               width: 2,
                             ),
                           ),
@@ -342,7 +343,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         submittedPinTheme: defaultPinTheme,
                         errorPinTheme: defaultPinTheme.copyWith(
                           decoration: defaultPinTheme.decoration!.copyWith(
-                            border: Border.all(color: Colors.red),
+                            border: Border.all(color: AppColors.coralRed),
                           ),
                         ),
                         onCompleted: (pin) => _verifyCode(),
@@ -350,7 +351,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       const SizedBox(height: 32),
                       if (_isLoading)
                         const CircularProgressIndicator(
-                          color: AppColors.warmOrange,
+                          color: AppColors.brightBlue,
                         )
                       else if (!_canResend)
                         Text(
@@ -368,7 +369,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                             style: GoogleFonts.dmSans(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.warmOrange,
+                              color: AppColors.brightBlue,
                             ),
                           ),
                         ),

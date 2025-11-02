@@ -15,6 +15,7 @@ class PendingApprovalScreen extends StatelessWidget {
     final user = authProvider.currentUser;
 
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -24,7 +25,7 @@ class PendingApprovalScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: AppColors.goldenYellow.withValues(alpha: 0.2),
+                  color: AppColors.lightYellow,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -39,7 +40,7 @@ class PendingApprovalScreen extends StatelessWidget {
                 style: GoogleFonts.dmSans(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.softBlack,
+                  color: AppColors.charcoalBlack,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -57,7 +58,7 @@ class PendingApprovalScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Colors.grey.shade200),
                 ),
@@ -87,14 +88,14 @@ class PendingApprovalScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.deepNavy.withValues(alpha: 0.05),
+                  color: AppColors.lightBlue,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.info_outline,
-                      color: AppColors.deepNavy,
+                      color: AppColors.brightBlue,
                       size: 24,
                     ),
                     const SizedBox(width: 16),
@@ -103,7 +104,7 @@ class PendingApprovalScreen extends StatelessWidget {
                         'Your account is being reviewed by your barangay council. You will receive an SMS notification within 24–48 hours.',
                         style: GoogleFonts.dmSans(
                           fontSize: 14,
-                          color: AppColors.softBlack,
+                          color: AppColors.charcoalBlack,
                           height: 1.5,
                         ),
                       ),
@@ -137,10 +138,10 @@ class PendingApprovalScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppColors.warmOrange.withValues(alpha: 0.1),
+            color: AppColors.lightBlue,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: AppColors.warmOrange, size: 20),
+          child: Icon(icon, color: AppColors.brightBlue, size: 20),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -160,7 +161,7 @@ class PendingApprovalScreen extends StatelessWidget {
                 value,
                 style: GoogleFonts.dmSans(
                   fontSize: 16,
-                  color: AppColors.softBlack,
+                  color: AppColors.charcoalBlack,
                   fontWeight: FontWeight.w600,
                 ),
               ),

@@ -78,7 +78,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: AppColors.coralRed,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -87,11 +87,12 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.softBlack),
+          icon: const Icon(Icons.arrow_back, color: AppColors.charcoalBlack),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -111,7 +112,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
                         style: GoogleFonts.dmSans(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.softBlack,
+                          color: AppColors.charcoalBlack,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -128,7 +129,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
                         value: 0.75,
                         backgroundColor: Colors.grey.shade200,
                         valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.warmOrange,
+                          AppColors.brightBlue,
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -228,7 +229,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
                               'Sign In',
                               style: GoogleFonts.dmSans(
                                 fontSize: 14,
-                                color: AppColors.warmOrange,
+                                color: AppColors.brightBlue,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
