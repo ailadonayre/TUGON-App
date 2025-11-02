@@ -140,16 +140,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
-                Center(
-                  child: Text(
-                    'Barangay Council Access',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 40),
                 Container(
                   padding: const EdgeInsets.all(18),

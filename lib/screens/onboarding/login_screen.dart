@@ -167,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFFFFD700), // Golden Yellow
+                  AppColors.goldenYellow, // Golden Yellow
                   Color(0xFFFFA500), // Orange
                   Color(0xFFFF8C00), // Dark Orange
                 ],
@@ -184,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     height: 300,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
                 ),
@@ -196,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     height: 200,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                     ),
                   ),
                 ),
@@ -208,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     height: 250,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
                 ),
@@ -220,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     height: 300,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.08),
+                      color: Colors.white.withValues(alpha: 0.08),
                     ),
                   ),
                 ),
@@ -296,7 +296,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                       label: 'Email',
                                       hint: 'Enter your email',
                                       keyboardType: TextInputType.emailAddress,
-                                      prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFFFFD700)),
+                                      prefixIcon: const Icon(Icons.email_outlined, color: AppColors.goldenYellow),
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return 'Please enter your email';
@@ -316,7 +316,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                       label: 'Password',
                                       hint: 'Enter your password',
                                       obscureText: _obscurePassword,
-                                      prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFFFFD700)),
+                                      prefixIcon: const Icon(Icons.lock_outline, color: AppColors.goldenYellow),
                                       suffixIcon: IconButton(
                                         icon: Icon(
                                           _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -352,7 +352,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                         child: Text(
                                           'Forgot password?',
                                           style: GoogleFonts.dmSans(
-                                            color: const Color(0xFFFFD700),
+                                            color: AppColors.goldenYellow,
                                             fontWeight: FontWeight.w600,
                                             fontSize: 14,
                                           ),
@@ -368,7 +368,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                       child: ElevatedButton(
                                         onPressed: authProvider.isLoading ? null : _signInWithEmail,
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFFFFD700),
+                                          backgroundColor: AppColors.goldenYellow,
                                           foregroundColor: Colors.white,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(16),
@@ -452,7 +452,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                           child: Text(
                                             'Sign up',
                                             style: GoogleFonts.dmSans(
-                                              color: const Color(0xFFFFD700),
+                                              color: AppColors.goldenYellow,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 14,
                                             ),
@@ -473,11 +473,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                             ),
                                           );
                                         },
-                                        icon: const Icon(Icons.admin_panel_settings, size: 18, color: Color(0xFFFFD700)),
+                                        icon: const Icon(Icons.admin_panel_settings, size: 18, color: AppColors.goldenYellow),
                                         label: Text(
                                           'Admin Portal',
                                           style: GoogleFonts.dmSans(
-                                            color: const Color(0xFFFFD700),
+                                            color: AppColors.goldenYellow,
                                             fontWeight: FontWeight.w600,
                                             fontSize: 14,
                                           ),
@@ -521,7 +521,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           border: Border.all(color: Colors.grey.shade200, width: 2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
