@@ -77,12 +77,12 @@ class VerificationRequiredScreen extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: AppColors.lightBlue,
+                                    color: AppColors.lightYellow,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: const Icon(
                                     Icons.checklist,
-                                    color: AppColors.brightBlue,
+                                    color: AppColors.goldenYellow,
                                     size: 24,
                                   ),
                                 ),
@@ -166,7 +166,7 @@ class VerificationRequiredScreen extends StatelessWidget {
                                 children: [
                                   const Icon(
                                     Icons.access_time,
-                                    color: AppColors.brightBlue,
+                                    color: AppColors.goldenYellow,
                                     size: 18,
                                   ),
                                   const SizedBox(width: 8),
@@ -175,7 +175,7 @@ class VerificationRequiredScreen extends StatelessWidget {
                                     style: GoogleFonts.dmSans(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: AppColors.brightBlue,
+                                      color: AppColors.charcoalBlack,
                                     ),
                                   ),
                                 ],
@@ -213,13 +213,13 @@ class VerificationRequiredScreen extends StatelessWidget {
           margin: const EdgeInsets.only(top: 2),
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: AppColors.lightBlue,
+            color: AppColors.lightYellow,
             shape: BoxShape.circle,
           ),
           child: const Icon(
             Icons.check,
             size: 16,
-            color: AppColors.brightBlue,
+            color: AppColors.goldenYellow,
           ),
         ),
         const SizedBox(width: 12),

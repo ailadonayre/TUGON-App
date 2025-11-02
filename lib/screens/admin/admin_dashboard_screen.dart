@@ -68,187 +68,195 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       body: RefreshIndicator(
         onRefresh: _loadData,
         color: AppColors.brightBlue,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome Card
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.brightBlue.withValues(alpha: 0.3),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
+        child: SafeArea(
+          bottom: false,
+          child: Builder(builder: (context) {
+            final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+            final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomInset + bottomPadding),
+              children: [
+                // Welcome Card
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppColors.brightBlue,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.brightBlue.withValues(alpha: 0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.admin_panel_settings,
+                          size: 32,
+                          color: AppColors.brightBlue,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Welcome, Admin!',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              authProvider.currentUser?.location.barangay ?? '',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 14,
+                                color: AppColors.white.withValues(alpha: 0.9),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Row(
+
+                const SizedBox(height: 28),
+
+                // Overview header
+                Text(
+                  'Overview',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.charcoalBlack,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Statistics Cards (GridView inside ListView)
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 1.0,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.admin_panel_settings,
-                        size: 32,
-                        color: AppColors.brightBlue,
-                      ),
+                    _buildStatCard(
+                      'Total Users',
+                      stats['total']?.toString() ?? '0',
+                      Icons.people_rounded,
+                      AppColors.brightBlue,
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Welcome, Admin!',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            authProvider.currentUser?.location.barangay ?? '',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              color: AppColors.white.withValues(alpha: 0.9),
-                            ),
-                          ),
-                        ],
-                      ),
+                    _buildStatCard(
+                      'Pending',
+                      stats['pending']?.toString() ?? '0',
+                      Icons.pending_actions_rounded,
+                      AppColors.goldenYellow,
+                    ),
+                    _buildStatCard(
+                      'Approved',
+                      stats['approved']?.toString() ?? '0',
+                      Icons.check_circle_rounded,
+                      AppColors.brightBlue,
+                    ),
+                    _buildStatCard(
+                      'Rejected',
+                      stats['rejected']?.toString() ?? '0',
+                      Icons.cancel_rounded,
+                      AppColors.coralRed,
                     ),
                   ],
                 ),
-              ),
 
-              const SizedBox(height: 28),
+                const SizedBox(height: 32),
 
-              // Statistics Cards
-              Text(
-                'Overview',
-                style: GoogleFonts.dmSans(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.charcoalBlack,
+                // Quick Actions header
+                Text(
+                  'Quick Actions',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.charcoalBlack,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 1.0,
-                children: [
-                  _buildStatCard(
-                    'Total Users',
-                    stats['total']?.toString() ?? '0',
-                    Icons.people_rounded,
-                    AppColors.brightBlue,
-                  ),
-                  _buildStatCard(
-                    'Pending',
-                    stats['pending']?.toString() ?? '0',
-                    Icons.pending_actions_rounded,
-                    AppColors.goldenYellow,
-                  ),
-                  _buildStatCard(
-                    'Approved',
-                    stats['approved']?.toString() ?? '0',
-                    Icons.check_circle_rounded,
-                    AppColors.brightBlue,
-                  ),
-                  _buildStatCard(
-                    'Rejected',
-                    stats['rejected']?.toString() ?? '0',
-                    Icons.cancel_rounded,
-                    AppColors.coralRed,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 32),
-
-              // Quick Actions
-              Text(
-                'Quick Actions',
-                style: GoogleFonts.dmSans(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.charcoalBlack,
+                _buildActionCard(
+                  'Pending Approvals',
+                  'Review and approve user registrations',
+                  Icons.how_to_reg_rounded,
+                  AppColors.goldenYellow,
+                      () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PendingApprovalsScreen(),
+                      ),
+                    );
+                  },
+                  badge: adminProvider.pendingUsers.length,
                 ),
-              ),
-              const SizedBox(height: 16),
 
-              _buildActionCard(
-                'Pending Approvals',
-                'Review and approve user registrations',
-                Icons.how_to_reg_rounded,
-                AppColors.goldenYellow,
-                    () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PendingApprovalsScreen(),
-                    ),
-                  );
-                },
-                badge: adminProvider.pendingUsers.length,
-              ),
+                const SizedBox(height: 12),
 
-              const SizedBox(height: 12),
+                _buildActionCard(
+                  'All Users',
+                  'View and manage all registered users',
+                  Icons.people_alt_rounded,
+                  AppColors.brightBlue,
+                      () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AllUsersScreen(),
+                      ),
+                    );
+                  },
+                ),
 
-              _buildActionCard(
-                'All Users',
-                'View and manage all registered users',
-                Icons.people_alt_rounded,
-                AppColors.brightBlue,
-                    () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const AllUsersScreen(),
-                    ),
-                  );
-                },
-              ),
+                const SizedBox(height: 12),
 
-              const SizedBox(height: 12),
+                _buildActionCard(
+                  'Statistics',
+                  'View detailed user statistics',
+                  Icons.bar_chart_rounded,
+                  AppColors.coralRed,
+                      () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const UserStatisticsScreen(),
+                      ),
+                    );
+                  },
+                ),
 
-              _buildActionCard(
-                'Statistics',
-                'View detailed user statistics',
-                Icons.bar_chart_rounded,
-                AppColors.coralRed,
-                    () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const UserStatisticsScreen(),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+                // Extra spacing at the end so the last item isn't flush to the bottom
+                SizedBox(height: bottomPadding + 24),
+              ],
+            );
+          }),
         ),
       ),
     );

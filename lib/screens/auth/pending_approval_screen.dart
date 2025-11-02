@@ -88,14 +88,14 @@ class PendingApprovalScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.lightBlue,
+                  color: AppColors.lightYellow,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   children: [
                     const Icon(
                       Icons.info_outline,
-                      color: AppColors.brightBlue,
+                      color: AppColors.goldenYellow,
                       size: 24,
                     ),
                     const SizedBox(width: 16),
@@ -138,10 +138,10 @@ class PendingApprovalScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppColors.lightBlue,
+            color: AppColors.lightYellow,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: AppColors.brightBlue, size: 20),
+          child: Icon(icon, color: AppColors.goldenYellow, size: 20),
         ),
         const SizedBox(width: 16),
         Expanded(

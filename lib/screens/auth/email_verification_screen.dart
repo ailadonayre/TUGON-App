@@ -113,7 +113,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.lightBlue,
+                color: AppColors.lightYellow,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -121,7 +121,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 style: GoogleFonts.dmSans(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.brightBlue,
+                  color: AppColors.goldenYellow,
                   letterSpacing: 8,
                 ),
               ),
@@ -288,7 +288,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 value: 1.0,
                 backgroundColor: Colors.grey.shade200,
                 valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.brightBlue,
+                  AppColors.goldenYellow,
                 ),
               ),
               const SizedBox(height: 32),
@@ -300,13 +300,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: AppColors.lightBlue,
+                          color: AppColors.lightYellow,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.email_outlined,
                           size: 60,
-                          color: AppColors.brightBlue,
+                          color: AppColors.goldenYellow,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -335,7 +335,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         focusedPinTheme: defaultPinTheme.copyWith(
                           decoration: defaultPinTheme.decoration!.copyWith(
                             border: Border.all(
-                              color: AppColors.brightBlue,
+                              color: AppColors.goldenYellow,
                               width: 2,
                             ),
                           ),
@@ -351,7 +351,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       const SizedBox(height: 32),
                       if (_isLoading)
                         const CircularProgressIndicator(
-                          color: AppColors.brightBlue,
+                          color: AppColors.goldenYellow,
                         )
                       else if (!_canResend)
                         Text(
@@ -369,7 +369,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                             style: GoogleFonts.dmSans(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.brightBlue,
+                              color: AppColors.goldenYellow,
                             ),
                           ),
                         ),

@@ -45,3 +45,5 @@ flutter:
     - .env
     - assets/logo/
     - assets/logo/TUGON_logo.png
+    - assets/logo/TUGON_Logo-lowercase-v2.png
+    - assets/logo/TUGON_Logo-uppercase.png

@@ -26,7 +26,7 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buttonColor = color ?? AppColors.brightBlue;
+    final buttonColor = color ?? AppColors.goldenYellow;
     final buttonTextColor = textColor ?? AppColors.white;
 
     return SizedBox(

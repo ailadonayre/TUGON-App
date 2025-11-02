@@ -114,7 +114,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                 value: 0.25,
                 backgroundColor: Colors.grey.shade200,
                 valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.brightBlue,
+                  AppColors.goldenYellow,
                 ),
               ),
               const SizedBox(height: 32),
@@ -165,7 +165,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
               CustomButton(
                 text: 'Continue',
                 onPressed: canContinue ? _continue : () {},
-                color: canContinue ? AppColors.brightBlue : Colors.grey,
+                color: canContinue ? AppColors.goldenYellow : Colors.grey,
               ),
             ],
           ),

@@ -101,7 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       style: GoogleFonts.dmSans(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.brightBlue,
+                        color: AppColors.coralRed,
                       ),
                     ),
                   ),

@@ -72,7 +72,7 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
                 value: 0.5,
                 backgroundColor: Colors.grey.shade200,
                 valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.brightBlue,
+                  AppColors.goldenYellow,
                 ),
               ),
               const SizedBox(height: 32),
@@ -171,12 +171,12 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.lightBlue
+              ? AppColors.lightYellow
               : AppColors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
-                ? AppColors.brightBlue
+                ? AppColors.goldenYellow
                 : Colors.grey.shade300,
             width: isSelected ? 2 : 1,
           ),
@@ -187,7 +187,7 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.brightBlue
+                    ? AppColors.goldenYellow
                     : Colors.grey.shade200,
                 shape: BoxShape.circle,
               ),
@@ -225,7 +225,7 @@ class _ResidencyCheckScreenState extends State<ResidencyCheckScreen> {
             if (isSelected)
               const Icon(
                 Icons.check_circle,
-                color: AppColors.brightBlue,
+                color: AppColors.goldenYellow,
                 size: 28,
               ),
           ],

@@ -112,11 +112,11 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
+                      color: AppColors.goldenYellow,
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.brightBlue.withValues(alpha: 0.3),
+                          color: AppColors.goldenYellow.withValues(alpha: 0.3),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),
@@ -187,7 +187,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   label: 'Admin Email',
                   hint: 'Enter your admin email',
                   keyboardType: TextInputType.emailAddress,
-                  prefixIcon: const Icon(Icons.email_outlined, color: AppColors.brightBlue),
+                  prefixIcon: const Icon(Icons.email_outlined, color: AppColors.goldenYellow),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -204,7 +204,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   label: 'Password',
                   hint: 'Enter your password',
                   obscureText: _obscurePassword,
-                  prefixIcon: const Icon(Icons.lock_outline, color: AppColors.brightBlue),
+                  prefixIcon: const Icon(Icons.lock_outline, color: AppColors.goldenYellow),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
@@ -230,7 +230,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   text: 'Login as Admin',
                   onPressed: _signInWithEmail,
                   isLoading: authProvider.isLoading,
-                  color: AppColors.brightBlue,
+                  color: AppColors.goldenYellow,
                 ),
                 const SizedBox(height: 20),
                 Center(

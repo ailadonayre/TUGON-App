@@ -83,13 +83,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.lightBlue,
+                color: AppColors.lightYellow,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.lock_reset,
                 size: 60,
-                color: AppColors.brightBlue,
+                color: AppColors.goldenYellow,
               ),
             ),
           ),
@@ -148,13 +148,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   const Icon(
                     Icons.arrow_back,
                     size: 18,
-                    color: AppColors.brightBlue,
+                    color: AppColors.goldenYellow,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Back to Login',
                     style: GoogleFonts.dmSans(
-                      color: AppColors.brightBlue,
+                      color: AppColors.goldenYellow,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -211,7 +211,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           style: GoogleFonts.dmSans(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: AppColors.brightBlue,
+            color: AppColors.goldenYellow,
           ),
         ),
         const SizedBox(height: 32),
@@ -257,7 +257,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: Text(
             'Try another email',
             style: GoogleFonts.dmSans(
-              color: AppColors.brightBlue,
+              color: AppColors.goldenYellow,
               fontWeight: FontWeight.w600,
             ),
           ),

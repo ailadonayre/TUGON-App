@@ -57,11 +57,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildNavItem(0, Icons.home_rounded, 'Home', AppColors.brightBlue),
+                  _buildNavItem(0, Icons.home_rounded, 'Home', AppColors.goldenYellow),
                   _buildNavItem(1, Icons.search_rounded, 'Search', AppColors.goldenYellow),
-                  _buildNavItem(2, Icons.add_circle_rounded, 'Report', AppColors.coralRed, isCenter: true),
+                  _buildNavItem(2, Icons.add_circle_rounded, 'Report', AppColors.goldenYellow, isCenter: true),
                   _buildNavItem(3, Icons.history_rounded, 'History', AppColors.goldenYellow),
-                  _buildNavItem(4, Icons.person_rounded, 'Profile', AppColors.brightBlue),
+                  _buildNavItem(4, Icons.person_rounded, 'Profile', AppColors.goldenYellow),
                 ],
               ),
             ),

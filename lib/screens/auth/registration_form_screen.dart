@@ -129,7 +129,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
                         value: 0.75,
                         backgroundColor: Colors.grey.shade200,
                         valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.brightBlue,
+                          AppColors.goldenYellow,
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -229,7 +229,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
                               'Sign In',
                               style: GoogleFonts.dmSans(
                                 fontSize: 14,
-                                color: AppColors.brightBlue,
+                                color: AppColors.goldenYellow,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

@@ -111,7 +111,7 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                 )
                     : null,
                 filled: true,
-                fillColor: AppColors.lightBlue,
+                fillColor: AppColors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,

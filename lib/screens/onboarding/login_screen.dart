@@ -165,11 +165,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             child: IntrinsicHeight(
               child: Column(
                 children: [
-                  // Header with Gradient
                   Container(
                     width: double.infinity,
                     decoration: const BoxDecoration(
-                      gradient: AppColors.primaryGradient,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(40),
                         bottomRight: Radius.circular(40),
@@ -183,46 +182,14 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           opacity: _fadeAnimation,
                           child: Column(
                             children: [
-                              // Logo
-                              Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: AppColors.white,
-                                  borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.1),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
-                                ),
-                                child: Image.asset(
-                                  'assets/logo/TUGON_logo.png',
-                                  width: 80,
-                                  height: 80,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
                               const SizedBox(height: 24),
-                              Text(
-                                'TUGON',
-                                style: GoogleFonts.dmSans(
-                                  fontSize: 42,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.white,
-                                  letterSpacing: 2,
-                                ),
+                              Image.asset(
+                                'assets/logo/TUGON_Logo-uppercase.png',
+                                width: 180,
+                                height: 180,
+                                fit: BoxFit.contain,
                               ),
                               const SizedBox(height: 8),
-                              Text(
-                                'Welcome back!',
-                                style: GoogleFonts.dmSans(
-                                  fontSize: 16,
-                                  color: AppColors.white.withValues(alpha: 0.9),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
                             ],
                           ),
                         ),
@@ -250,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   label: 'Email Address',
                                   hint: 'Enter your email',
                                   keyboardType: TextInputType.emailAddress,
-                                  prefixIcon: const Icon(Icons.email_outlined, color: AppColors.brightBlue),
+                                  prefixIcon: const Icon(Icons.email_outlined, color: AppColors.goldenYellow),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Please enter your email';
@@ -269,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   label: 'Password',
                                   hint: 'Enter your password',
                                   obscureText: _obscurePassword,
-                                  prefixIcon: const Icon(Icons.lock_outline, color: AppColors.brightBlue),
+                                  prefixIcon: const Icon(Icons.lock_outline, color: AppColors.goldenYellow),
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -304,7 +271,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                     child: Text(
                                       'Forgot Password?',
                                       style: GoogleFonts.dmSans(
-                                        color: AppColors.brightBlue,
+                                        color: AppColors.goldenYellow,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -317,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   text: 'Login',
                                   onPressed: _signInWithEmail,
                                   isLoading: authProvider.isLoading,
-                                  color: AppColors.brightBlue,
+                                  color: AppColors.goldenYellow,
                                 ),
 
                                 const SizedBox(height: 20),

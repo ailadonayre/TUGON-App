@@ -58,7 +58,7 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
           ),
         ],
       ),
-      backgroundColor: AppColors.lightBlue,
+      backgroundColor: AppColors.white,
       body: RefreshIndicator(
         onRefresh: _loadStatistics,
         color: AppColors.brightBlue,
@@ -73,7 +73,7 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
+                  color: AppColors.coralRed,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
