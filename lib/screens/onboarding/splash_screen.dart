@@ -93,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                             ],
                           ),
                           child: Image.asset(
-                            'assets/logo/TUGON logo.png',
+                            'assets/logo/TUGON_logo.png',
                             width: 120,
                             height: 120,
                             fit: BoxFit.contain,

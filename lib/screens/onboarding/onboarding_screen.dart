@@ -86,12 +86,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   // Logo
                   Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.lightBlue,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    decoration: BoxDecoration(),
                     child: Image.asset(
-                      'assets/logo/TUGON logo.png',
+                      'assets/logo/TUGON_logo.png',
                       width: 32,
                       height: 32,
                       fit: BoxFit.contain,

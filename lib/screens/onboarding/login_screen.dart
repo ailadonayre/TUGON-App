@@ -198,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   ],
                                 ),
                                 child: Image.asset(
-                                  'assets/logo/TUGON logo.png',
+                                  'assets/logo/TUGON_logo.png',
                                   width: 80,
                                   height: 80,
                                   fit: BoxFit.contain,
