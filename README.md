@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="assets/logo/TUGON Logo.png" alt="TUGON Logo" width="120" height="120"/>
+  <img src="assets/logo/TUGON_logo.png" alt="TUGON Logo" width="120" height="120"/>
 </p>
 
 <h1 align="center">
-  <img src="assets/logo/TUGON%20Logo-uppercase.png" alt="TUGON" width="120" style="vertical-align: middle;"/>  
+  <img src="assets/logo/TUGON_Logo-uppercase.png" alt="TUGON" width="120" style="vertical-align: middle;"/>  
   Centralized Barangay Assistance & Reporting Platform
 </h1>
 
@@ -184,7 +184,7 @@ flutter run
   💡 <b style="color:#5A84F7; font-size:20px;">
     Empowering Communities. Strengthening Connections. Building the Future with
   </b>
-  <img src="assets/logo/TUGON Logo-lowercase-v2.png" 
+  <img src="assets/logo/TUGON_Logo-lowercase-v2.png" 
        alt="TUGON Logo" 
        width="50" 
        style="vertical-align:middle;"/>
