@@ -293,7 +293,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
             child: Icon(icon, size: 32, color: color),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 2),
           Text(
             value,
             style: GoogleFonts.dmSans(

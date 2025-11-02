@@ -60,110 +60,42 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.primaryGradient,
-        ),
-        child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(),
-
-                // Animated Logo
-                AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _scaleAnimation.value,
-                      child: Opacity(
-                        opacity: _fadeAnimation.value,
-                        child: Container(
-                          padding: const EdgeInsets.all(32),
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: BorderRadius.circular(32),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                blurRadius: 30,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Image.asset(
-                            'assets/logo/TUGON_logo.png',
-                            width: 120,
-                            height: 120,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
+      backgroundColor: AppColors.white,
+      body: SafeArea(
+        child: Center(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: _scaleAnimation.value,
+                child: Opacity(
+                  opacity: _fadeAnimation.value,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Icon Logo
+                      Image.asset(
+                        'assets/logo/TUGON_logo.png',
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.contain,
                       ),
-                    );
-                  },
-                ),
 
-                const SizedBox(height: 40),
+                      const SizedBox(height: 24),
 
-                // App Name
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Text(
-                    'TUGON',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 56,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.white,
-                      letterSpacing: 4,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          offset: const Offset(0, 4),
-                          blurRadius: 10,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Tagline
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Text(
-                    'Barangay Help & Service App',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.white.withValues(alpha: 0.95),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-
-                const Spacer(),
-
-                // Loading Indicator
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 60),
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.white.withValues(alpha: 0.8),
-                        ),
-                        strokeWidth: 3,
+                      // Text Logo
+                      Image.asset(
+                        'assets/logo/TUGON_Logo-uppercase.png',
+                        width: 300,
+                        height: 100,
+                        fit: BoxFit.contain,
                       ),
-                    ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),

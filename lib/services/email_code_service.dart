@@ -38,7 +38,7 @@ class EmailCodeService {
               'email': email,
             }
           ],
-          'subject': 'Your Verification Code - Tugon App',
+          'subject': 'Your Verification Code - TUGON App',
           'htmlContent': '''
             <!DOCTYPE html>
             <html>
@@ -61,7 +61,7 @@ class EmailCodeService {
                   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                 }
                 .header { 
-                  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+                  background: #FFB300;
                   color: white; 
                   padding: 40px 20px; 
                   text-align: center; 
@@ -75,8 +75,8 @@ class EmailCodeService {
                   padding: 40px 30px; 
                 }
                 .code-box { 
-                  background: #FFF5F2;
-                  border: 3px solid #FF6B35; 
+                  background: #FFF8E1;
+                  border: 3px solid #FFB300; 
                   border-radius: 12px; 
                   padding: 30px; 
                   text-align: center; 
@@ -85,13 +85,13 @@ class EmailCodeService {
                 .code { 
                   font-size: 48px; 
                   font-weight: bold; 
-                  color: #FF6B35; 
+                  color: #FFB300; 
                   letter-spacing: 12px;
                   font-family: 'Courier New', monospace;
                 }
                 .info {
                   background: #F8F9FA;
-                  border-left: 4px solid #FF6B35;
+                  border-left: 4px solid #FFB300;
                   padding: 15px;
                   margin: 20px 0;
                   border-radius: 4px;
@@ -107,7 +107,7 @@ class EmailCodeService {
                 .button {
                   display: inline-block;
                   padding: 12px 30px;
-                  background: #FF6B35;
+                  background: #FFB300;
                   color: white;
                   text-decoration: none;
                   border-radius: 6px;
@@ -119,11 +119,11 @@ class EmailCodeService {
             <body>
               <div class="container">
                 <div class="header">
-                  <h1>🔐 Email Verification</h1>
+                  <h1>Verify your email</h1>
                 </div>
                 <div class="content">
                   <p style="font-size: 16px;">Hello,</p>
-                  <p style="font-size: 16px;">Thank you for signing up for <strong>Tugon App</strong>! To complete your registration, please verify your email address using the code below:</p>
+                  <p style="font-size: 16px;">Thank you for signing up for <strong>TUGON App</strong>! To complete your registration, please verify your email address using the code below:</p>
                   
                   <div class="code-box">
                     <div class="code">$code</div>
