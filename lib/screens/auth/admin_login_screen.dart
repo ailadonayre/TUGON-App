@@ -6,7 +6,7 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/custom_textfield.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
-import '../admin/admin_dashboard_screen.dart'; // Add this import
+import '../admin/admin_dashboard_screen.dart';
 import 'pending_approval_screen.dart';
 
 class AdminLoginScreen extends StatefulWidget {
@@ -48,9 +48,18 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
           );
         } else {
           if (user?.status == 'approved') {
-            // TODO: Replace with your actual HomeScreen
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('✅ Login successful!')),
+              SnackBar(
+                content: Text(
+                  '✅ Login successful!',
+                  style: GoogleFonts.dmSans(),
+                ),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             );
           } else if (user?.status == 'pending_review') {
             Navigator.pushReplacement(
@@ -62,8 +71,15 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(authProvider.error ?? 'Login failed'),
-            backgroundColor: Colors.red,
+            content: Text(
+              authProvider.error ?? 'Login failed',
+              style: GoogleFonts.dmSans(),
+            ),
+            backgroundColor: AppColors.coralRed,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
@@ -79,7 +95,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.softBlack),
+          icon: const Icon(Icons.arrow_back, color: AppColors.charcoalBlack),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -94,26 +110,33 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 const SizedBox(height: 20),
                 Center(
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: AppColors.deepNavy,
-                      borderRadius: BorderRadius.circular(20),
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.brightBlue.withOpacity(0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
                     ),
                     child: const Icon(
-                      Icons.admin_panel_settings,
+                      Icons.admin_panel_settings_rounded,
                       size: 60,
-                      color: AppColors.warmOrange,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
                 Center(
                   child: Text(
                     'Admin Login',
                     style: GoogleFonts.dmSans(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.deepNavy,
+                      color: AppColors.charcoalBlack,
                     ),
                   ),
                 ),
@@ -129,19 +152,19 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 ),
                 const SizedBox(height: 40),
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: AppColors.goldenYellow.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    color: AppColors.goldenYellow.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: AppColors.goldenYellow.withValues(alpha: 0.3),
+                      color: AppColors.goldenYellow.withOpacity(0.3),
                     ),
                   ),
                   child: Row(
                     children: [
                       Icon(
                         Icons.warning_amber_rounded,
-                        color: AppColors.goldenYellow.withValues(alpha: 0.8),
+                        color: AppColors.goldenYellow,
                         size: 24,
                       ),
                       const SizedBox(width: 12),
@@ -150,7 +173,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                           'This portal is for authorized barangay officials only.',
                           style: GoogleFonts.dmSans(
                             fontSize: 13,
-                            color: AppColors.softBlack,
+                            color: AppColors.charcoalBlack,
                             height: 1.4,
                           ),
                         ),
@@ -164,7 +187,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   label: 'Admin Email',
                   hint: 'Enter your admin email',
                   keyboardType: TextInputType.emailAddress,
-                  prefixIcon: const Icon(Icons.email_outlined),
+                  prefixIcon: const Icon(Icons.email_outlined, color: AppColors.brightBlue),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -181,7 +204,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   label: 'Password',
                   hint: 'Enter your password',
                   obscureText: _obscurePassword,
-                  prefixIcon: const Icon(Icons.lock_outline),
+                  prefixIcon: const Icon(Icons.lock_outline, color: AppColors.brightBlue),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
@@ -207,6 +230,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   text: 'Login as Admin',
                   onPressed: _signInWithEmail,
                   isLoading: authProvider.isLoading,
+                  color: AppColors.brightBlue,
                 ),
                 const SizedBox(height: 20),
                 Center(

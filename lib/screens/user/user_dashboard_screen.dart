@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
-import '../../providers/auth_provider.dart';
 import 'user_home_screen.dart';
 import 'user_search_screen.dart';
 import 'user_report_screen.dart';
@@ -33,14 +31,14 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       body: _screens[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -48,22 +46,22 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         ),
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
           ),
           child: BottomAppBar(
             elevation: 0,
-            color: Colors.white,
+            color: AppColors.white,
             child: SizedBox(
               height: 70,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildNavItem(0, Icons.home_rounded, 'Home'),
-                  _buildNavItem(1, Icons.search_rounded, 'Search'),
-                  _buildNavItem(2, Icons.add_circle, 'Report', isCenter: true),
-                  _buildNavItem(3, Icons.history_rounded, 'History'),
-                  _buildNavItem(4, Icons.person_rounded, 'Profile'),
+                  _buildNavItem(0, Icons.home_rounded, 'Home', AppColors.brightBlue),
+                  _buildNavItem(1, Icons.search_rounded, 'Search', AppColors.goldenYellow),
+                  _buildNavItem(2, Icons.add_circle_rounded, 'Report', AppColors.coralRed, isCenter: true),
+                  _buildNavItem(3, Icons.history_rounded, 'History', AppColors.goldenYellow),
+                  _buildNavItem(4, Icons.person_rounded, 'Profile', AppColors.brightBlue),
                 ],
               ),
             ),
@@ -73,7 +71,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label, {bool isCenter = false}) {
+  Widget _buildNavItem(int index, IconData icon, String label, Color activeColor, {bool isCenter = false}) {
     final isSelected = _currentIndex == index;
 
     if (isCenter) {
@@ -83,23 +81,23 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.warmOrange, Color(0xFFF7931E)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            gradient: isSelected
+                ? AppColors.primaryGradient
+                : LinearGradient(
+              colors: [activeColor.withOpacity(0.8), activeColor],
             ),
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppColors.warmOrange.withValues(alpha: 0.4),
+                color: (isSelected ? AppColors.coralRed : activeColor).withOpacity(0.4),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
               ),
             ],
           ),
-          child: const Icon(
+          child: Icon(
             Icons.add_rounded,
-            color: Colors.white,
+            color: AppColors.white,
             size: 32,
           ),
         ),
@@ -108,24 +106,36 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? AppColors.warmOrange : Colors.grey.shade400,
-            size: 28,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.dmSans(
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? AppColors.warmOrange : Colors.grey.shade400,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(
+          horizontal: isSelected ? 16 : 12,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? activeColor.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? activeColor : Colors.grey.shade400,
+              size: isSelected ? 28 : 26,
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: GoogleFonts.dmSans(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? activeColor : Colors.grey.shade400,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

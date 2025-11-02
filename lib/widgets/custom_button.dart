@@ -9,7 +9,7 @@ class CustomButton extends StatelessWidget {
   final bool isOutlined;
   final Color? color;
   final Color? textColor;
-  final Widget? icon; // <-- change type to Widget
+  final Widget? icon;
   final double? width;
 
   const CustomButton({
@@ -20,14 +20,14 @@ class CustomButton extends StatelessWidget {
     this.isOutlined = false,
     this.color,
     this.textColor,
-    this.icon, // <-- no change needed here
+    this.icon,
     this.width,
   });
 
   @override
   Widget build(BuildContext context) {
-    final buttonColor = color ?? AppColors.warmOrange;
-    final buttonTextColor = textColor ?? Colors.white;
+    final buttonColor = color ?? AppColors.brightBlue;
+    final buttonTextColor = textColor ?? AppColors.white;
 
     return SizedBox(
       width: width ?? double.infinity,
@@ -38,7 +38,7 @@ class CustomButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           side: BorderSide(color: buttonColor, width: 2),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
         child: _buildChild(buttonColor),
@@ -49,9 +49,10 @@ class CustomButton extends StatelessWidget {
           backgroundColor: buttonColor,
           foregroundColor: buttonTextColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
-          elevation: 2,
+          elevation: 3,
+          shadowColor: buttonColor.withOpacity(0.4),
         ),
         child: _buildChild(buttonTextColor),
       ),
@@ -74,7 +75,7 @@ class CustomButton extends StatelessWidget {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          icon!, // <-- now you can directly use the widget
+          icon!,
           const SizedBox(width: 8),
           Text(
             text,

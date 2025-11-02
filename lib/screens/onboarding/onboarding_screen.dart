@@ -18,25 +18,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<OnboardingPage> _pages = [
     OnboardingPage(
-      icon: Icons.campaign,
+      icon: Icons.campaign_rounded,
       title: 'Stay Informed',
       description:
       'Receive real-time announcements and advisories from your barangay council.',
-      color: AppColors.warmOrange,
+      color: AppColors.brightBlue,
     ),
     OnboardingPage(
-      icon: Icons.report_problem_outlined,
+      icon: Icons.report_problem_rounded,
       title: 'Report Issues',
       description:
       'Easily report community concerns like road damage, streetlight issues, or safety concerns.',
-      color: AppColors.goldenYellow,
+      color: AppColors.coralRed,
     ),
     OnboardingPage(
-      icon: Icons.description_outlined,
+      icon: Icons.description_rounded,
       title: 'Request Documents',
       description:
       'Request barangay documents like clearances, certificates, and permits with ease.',
-      color: AppColors.deepNavy,
+      color: AppColors.goldenYellow,
     ),
   ];
 
@@ -80,19 +80,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             // Skip button
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: TextButton(
-                  onPressed: _skipToLogin,
-                  child: Text(
-                    'Skip',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.warmOrange,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Logo
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.lightBlue,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Image.asset(
+                      'assets/logo/TUGON logo.png',
+                      width: 32,
+                      height: 32,
+                      fit: BoxFit.contain,
                     ),
                   ),
-                ),
+                  TextButton(
+                    onPressed: _skipToLogin,
+                    child: Text(
+                      'Skip',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.brightBlue,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
@@ -122,12 +138,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
             // Next/Get Started button
             Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
               child: CustomButton(
                 text: _currentPage == _pages.length - 1
                     ? 'Get Started'
                     : 'Next',
                 onPressed: _nextPage,
+                color: _pages[_currentPage].color,
               ),
             ),
           ],
@@ -143,15 +160,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(40),
+            padding: const EdgeInsets.all(48),
             decoration: BoxDecoration(
-              color: page.color.withValues(alpha: 0.15),
+              color: page.color.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              page.icon,
-              size: 100,
-              color: page.color,
+            child: Container(
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: page.color.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                page.icon,
+                size: 80,
+                color: page.color,
+              ),
             ),
           ),
           const SizedBox(height: 48),
@@ -160,7 +184,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: GoogleFonts.dmSans(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: AppColors.softBlack,
+              color: AppColors.charcoalBlack,
             ),
             textAlign: TextAlign.center,
           ),
@@ -187,7 +211,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       height: 8,
       decoration: BoxDecoration(
         color: _currentPage == index
-            ? AppColors.warmOrange
+            ? _pages[_currentPage].color
             : Colors.grey.shade300,
         borderRadius: BorderRadius.circular(4),
       ),

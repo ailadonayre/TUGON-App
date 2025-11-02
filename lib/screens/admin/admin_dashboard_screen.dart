@@ -44,18 +44,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           'Admin Dashboard',
           style: GoogleFonts.dmSans(
             fontWeight: FontWeight.bold,
-            color: AppColors.softBlack,
+            color: AppColors.charcoalBlack,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.softBlack),
+            icon: const Icon(Icons.refresh, color: AppColors.brightBlue),
             onPressed: _loadData,
           ),
           IconButton(
-            icon: const Icon(Icons.logout, color: AppColors.softBlack),
+            icon: const Icon(Icons.logout, color: AppColors.coralRed),
             onPressed: () async {
               await authProvider.signOut();
               if (context.mounted) {
@@ -67,6 +67,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: _loadData,
+        color: AppColors.brightBlue,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(20),
@@ -75,22 +76,37 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             children: [
               // Welcome Card
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.warmOrange, Color(0xFFF7931E)],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
+                  gradient: AppColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.brightBlue.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.white,
-                      child: Icon(
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
                         Icons.admin_panel_settings,
-                        size: 35,
-                        color: AppColors.warmOrange,
+                        size: 32,
+                        color: AppColors.brightBlue,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -101,16 +117,17 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           Text(
                             'Welcome, Admin!',
                             style: GoogleFonts.dmSans(
-                              fontSize: 20,
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.white,
                             ),
                           ),
+                          const SizedBox(height: 4),
                           Text(
                             authProvider.currentUser?.location.barangay ?? '',
                             style: GoogleFonts.dmSans(
                               fontSize: 14,
-                              color: Colors.white.withValues(alpha: 0.9),
+                              color: AppColors.white.withOpacity(0.9),
                             ),
                           ),
                         ],
@@ -120,15 +137,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
 
               // Statistics Cards
               Text(
                 'Overview',
                 style: GoogleFonts.dmSans(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.softBlack,
+                  color: AppColors.charcoalBlack,
                 ),
               ),
               const SizedBox(height: 16),
@@ -144,26 +161,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   _buildStatCard(
                     'Total Users',
                     stats['total']?.toString() ?? '0',
-                    Icons.people,
-                    Colors.blue,
+                    Icons.people_rounded,
+                    AppColors.brightBlue,
                   ),
                   _buildStatCard(
                     'Pending',
                     stats['pending']?.toString() ?? '0',
-                    Icons.pending_actions,
-                    Colors.orange,
+                    Icons.pending_actions_rounded,
+                    AppColors.goldenYellow,
                   ),
                   _buildStatCard(
                     'Approved',
                     stats['approved']?.toString() ?? '0',
-                    Icons.check_circle,
+                    Icons.check_circle_rounded,
                     Colors.green,
                   ),
                   _buildStatCard(
                     'Rejected',
                     stats['rejected']?.toString() ?? '0',
-                    Icons.cancel,
-                    Colors.red,
+                    Icons.cancel_rounded,
+                    AppColors.coralRed,
                   ),
                 ],
               ),
@@ -174,9 +191,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               Text(
                 'Quick Actions',
                 style: GoogleFonts.dmSans(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.softBlack,
+                  color: AppColors.charcoalBlack,
                 ),
               ),
               const SizedBox(height: 16),
@@ -184,8 +201,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               _buildActionCard(
                 'Pending Approvals',
                 'Review and approve user registrations',
-                Icons.how_to_reg,
-                Colors.orange,
+                Icons.how_to_reg_rounded,
+                AppColors.goldenYellow,
                     () {
                   Navigator.push(
                     context,
@@ -202,8 +219,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               _buildActionCard(
                 'All Users',
                 'View and manage all registered users',
-                Icons.people_alt,
-                Colors.blue,
+                Icons.people_alt_rounded,
+                AppColors.brightBlue,
                     () {
                   Navigator.push(
                     context,
@@ -219,8 +236,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               _buildActionCard(
                 'Statistics',
                 'View detailed user statistics',
-                Icons.bar_chart,
-                Colors.purple,
+                Icons.bar_chart_rounded,
+                AppColors.coralRed,
                     () {
                   Navigator.push(
                     context,
@@ -244,21 +261,35 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       Color color,
       ) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 36, color: color),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 32, color: color),
+          ),
           const SizedBox(height: 12),
           Text(
             value,
             style: GoogleFonts.dmSans(
-              fontSize: 28,
+              fontSize: 32,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -268,7 +299,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             title,
             style: GoogleFonts.dmSans(
               fontSize: 12,
-              color: AppColors.softBlack.withValues(alpha: 0.7),
+              fontWeight: FontWeight.w600,
+              color: AppColors.charcoalBlack.withOpacity(0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -289,14 +321,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: Colors.grey.shade100),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -305,12 +337,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: color, size: 28),
+              child: Icon(icon, color: color, size: 26),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -324,7 +356,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         style: GoogleFonts.dmSans(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.softBlack,
+                          color: AppColors.charcoalBlack,
                         ),
                       ),
                       if (badge != null && badge > 0) ...[
@@ -332,18 +364,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
-                            vertical: 2,
+                            vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.red,
+                            color: AppColors.coralRed,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
                             badge.toString(),
                             style: GoogleFonts.dmSans(
-                              fontSize: 12,
+                              fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.white,
                             ),
                           ),
                         ),
@@ -362,7 +394,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
             ),
             Icon(
-              Icons.arrow_forward_ios,
+              Icons.arrow_forward_ios_rounded,
               size: 16,
               color: Colors.grey.shade400,
             ),

@@ -98,11 +98,11 @@ class FirebaseErrorApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         body: Center(
           child: Text(
             'Failed to initialize Firebase.\nPlease check your configuration.',
-            style: TextStyle(color: Colors.red.shade700, fontSize: 16),
+            style: TextStyle(color: AppColors.coralRed, fontSize: 16),
             textAlign: TextAlign.center,
           ),
         ),
@@ -126,48 +126,81 @@ class MyApp extends StatelessWidget {
         title: 'TUGON',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primaryColor: AppColors.deepNavy,
-          scaffoldBackgroundColor: AppColors.offWhite,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: AppColors.deepNavy,
-            primary: AppColors.deepNavy,
-            secondary: AppColors.warmOrange,
+          useMaterial3: true,
+          primaryColor: AppColors.brightBlue,
+          scaffoldBackgroundColor: AppColors.white,
+          colorScheme: ColorScheme.light(
+            primary: AppColors.brightBlue,
+            secondary: AppColors.coralRed,
+            tertiary: AppColors.goldenYellow,
+            surface: AppColors.white,
+            onPrimary: AppColors.white,
+            onSecondary: AppColors.white,
+            onSurface: AppColors.charcoalBlack,
           ),
-          textTheme: GoogleFonts.dmSansTextTheme(),
+          textTheme: GoogleFonts.dmSansTextTheme(
+            ThemeData.light().textTheme.apply(
+              bodyColor: AppColors.charcoalBlack,
+              displayColor: AppColors.charcoalBlack,
+            ),
+          ),
+          appBarTheme: AppBarTheme(
+            backgroundColor: AppColors.white,
+            foregroundColor: AppColors.charcoalBlack,
+            elevation: 0,
+            centerTitle: true,
+            titleTextStyle: GoogleFonts.dmSans(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColors.charcoalBlack,
+            ),
+          ),
           inputDecorationTheme: InputDecorationTheme(
             filled: true,
-            fillColor: Colors.white,
+            fillColor: AppColors.white,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: Colors.grey.shade200),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: Colors.grey.shade200),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.warmOrange, width: 2),
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: AppColors.brightBlue, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.red, width: 1),
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: AppColors.coralRed, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: AppColors.coralRed, width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.warmOrange,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.brightBlue,
+              foregroundColor: AppColors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
               ),
+              elevation: 2,
               textStyle: GoogleFonts.dmSans(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
             ),
+          ),
+          cardTheme: CardTheme(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            color: AppColors.white,
           ),
         ),
         home: const SplashScreen(),

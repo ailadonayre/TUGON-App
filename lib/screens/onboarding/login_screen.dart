@@ -10,7 +10,7 @@ import '../auth/location_selection_screen.dart';
 import '../auth/forgot_password_screen.dart';
 import '../auth/pending_approval_screen.dart';
 import '../auth/admin_login_screen.dart';
-import '../admin/admin_dashboard_screen.dart'; // Add this import
+import '../admin/admin_dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,16 +19,41 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
+
+    _animationController.forward();
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -44,20 +69,16 @@ class _LoginScreenState extends State<LoginScreen> {
         if (success) {
           final user = authProvider.currentUser;
 
-          // ✅ ADD THIS LOGIC - Check if admin or regular user
           if (user?.isAdmin == true) {
-            // If user is admin, go to Admin Dashboard
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
             );
           } else {
-            // Regular user - check status
             if (user?.status == 'approved') {
-              // Go to User Home/Dashboard
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const UserDashboardScreen()), // Or your user dashboard
+                MaterialPageRoute(builder: (_) => const UserDashboardScreen()),
               );
             } else if (user?.status == 'pending_review') {
               Navigator.pushReplacement(
@@ -68,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Account status: ${user?.status ?? "unknown"}'),
-                  backgroundColor: Colors.orange,
+                  backgroundColor: AppColors.goldenYellow,
                 ),
               );
             }
@@ -77,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(authProvider.error ?? 'Login failed'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.coralRed,
             ),
           );
         }
@@ -93,15 +114,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (success) {
         final user = authProvider.currentUser;
 
-        // ✅ ADD THIS LOGIC
         if (user?.isAdmin == true) {
-          // Admin user
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
           );
         } else {
-          // Regular user
           if (user?.status == 'approved') {
             Navigator.pushReplacement(
               context,
@@ -116,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Account status: ${user?.status ?? "unknown"}'),
-                backgroundColor: Colors.orange,
+                backgroundColor: AppColors.goldenYellow,
               ),
             );
           }
@@ -125,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authProvider.error ?? 'Google sign-in failed'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.coralRed,
           ),
         );
       }
@@ -135,196 +153,271 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 40),
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.deepNavy,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(
-                      Icons.people_alt_rounded,
-                      size: 60,
-                      color: AppColors.warmOrange,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Center(
-                  child: Text(
-                    'TUGON',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.deepNavy,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Center(
-                  child: Text(
-                    'Welcome back!',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                CustomTextField(
-                  controller: _emailController,
-                  label: 'Email Address',
-                  hint: 'Enter your email',
-                  keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icon(Icons.email_outlined),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-                CustomTextField(
-                  controller: _passwordController,
-                  label: 'Password',
-                  hint: 'Enter your password',
-                  obscureText: _obscurePassword,
-                  prefixIcon: Icon(Icons.lock_outline),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                      color: Colors.grey.shade600,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const ForgotPasswordScreen(),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Forgot Password?',
-                      style: GoogleFonts.dmSans(
-                        color: AppColors.warmOrange,
-                        fontWeight: FontWeight.w600,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+            ),
+            child: IntrinsicHeight(
+              child: Column(
+                children: [
+                  // Header with Gradient
+                  Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(40),
+                        bottomRight: Radius.circular(40),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                CustomButton(
-                  text: 'Login',
-                  onPressed: _signInWithEmail,
-                  isLoading: authProvider.isLoading,
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'OR',
-                        style: GoogleFonts.dmSans(
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                CustomButton(
-                  text: 'Continue with Google',
-                  onPressed: _signInWithGoogle,
-                  isLoading: authProvider.isLoading,
-                  color: Colors.white,
-                  textColor: AppColors.softBlack,
-                  icon: const Icon(Icons.g_mobiledata, size: 30, color: Colors.redAccent),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account? ",
-                      style: GoogleFonts.dmSans(
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const LocationSelectionScreen(),
+                    child: SafeArea(
+                      bottom: false,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+                        child: FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: Column(
+                            children: [
+                              // Logo
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Image.asset(
+                                  'assets/logo/TUGON logo.png',
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              Text(
+                                'TUGON',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 42,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.white,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Welcome back!',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 16,
+                                  color: AppColors.white.withOpacity(0.9),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                      child: Text(
-                        'Register',
-                        style: GoogleFonts.dmSans(
-                          color: AppColors.warmOrange,
-                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const AdminLoginScreen(),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Admin Login',
-                      style: GoogleFonts.dmSans(
-                        color: AppColors.deepNavy,
-                        fontWeight: FontWeight.w600,
-                        decoration: TextDecoration.underline,
                       ),
                     ),
                   ),
-                ),
-              ],
+
+                  // Form Section
+                  Expanded(
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                const SizedBox(height: 8),
+
+                                CustomTextField(
+                                  controller: _emailController,
+                                  label: 'Email Address',
+                                  hint: 'Enter your email',
+                                  keyboardType: TextInputType.emailAddress,
+                                  prefixIcon: const Icon(Icons.email_outlined, color: AppColors.brightBlue),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your email';
+                                    }
+                                    if (!value.contains('@')) {
+                                      return 'Please enter a valid email';
+                                    }
+                                    return null;
+                                  },
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                CustomTextField(
+                                  controller: _passwordController,
+                                  label: 'Password',
+                                  hint: 'Enter your password',
+                                  obscureText: _obscurePassword,
+                                  prefixIcon: const Icon(Icons.lock_outline, color: AppColors.brightBlue),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscurePassword = !_obscurePassword;
+                                      });
+                                    },
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your password';
+                                    }
+                                    return null;
+                                  },
+                                ),
+
+                                const SizedBox(height: 8),
+
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => const ForgotPasswordScreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Forgot Password?',
+                                      style: GoogleFonts.dmSans(
+                                        color: AppColors.brightBlue,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 24),
+
+                                CustomButton(
+                                  text: 'Login',
+                                  onPressed: _signInWithEmail,
+                                  isLoading: authProvider.isLoading,
+                                  color: AppColors.brightBlue,
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                Row(
+                                  children: [
+                                    Expanded(child: Divider(color: Colors.grey.shade300)),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                                      child: Text(
+                                        'OR',
+                                        style: GoogleFonts.dmSans(
+                                          color: Colors.grey.shade600,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(child: Divider(color: Colors.grey.shade300)),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                CustomButton(
+                                  text: 'Continue with Google',
+                                  onPressed: _signInWithGoogle,
+                                  isLoading: authProvider.isLoading,
+                                  color: AppColors.white,
+                                  textColor: AppColors.charcoalBlack,
+                                  icon: const Icon(Icons.g_mobiledata, size: 30, color: Colors.redAccent),
+                                ),
+
+                                const SizedBox(height: 24),
+
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Don't have an account? ",
+                                      style: GoogleFonts.dmSans(
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (_) => const LocationSelectionScreen(),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        'Register',
+                                        style: GoogleFonts.dmSans(
+                                          color: AppColors.coralRed,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 12),
+
+                                Center(
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => const AdminLoginScreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.admin_panel_settings, size: 18, color: AppColors.goldenYellow),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Admin Login',
+                                          style: GoogleFonts.dmSans(
+                                            color: AppColors.goldenYellow,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 16),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
