@@ -51,6 +51,9 @@ app.*.map.json
 # Local environment files
 .env
 
+# Firebase API
+lib/firebase_options.dart
+
 # macOS Finder metadata
 .DS_Store
 

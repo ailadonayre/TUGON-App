@@ -2,32 +2,92 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'firebase_options.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
 import 'providers/admin_provider.dart';
 import 'screens/onboarding/splash_screen.dart';
 import 'utils/colors.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await dotenv.load(fileName: ".env");
 
-  // Safely initialize Firebase
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    final options = _firebaseOptionsFromEnv();
+    await Firebase.initializeApp(options: options);
     runApp(const MyApp());
   } catch (e, stack) {
-    // This helps identify Firebase setup issues during early runs
     debugPrint('Firebase initialization failed: $e');
     debugPrintStack(stackTrace: stack);
-
-    // Run a minimal fallback app to show an error message
     runApp(const FirebaseErrorApp());
+  }
+}
+
+FirebaseOptions _firebaseOptionsFromEnv() {
+  String? e(String key) => dotenv.env[key];
+
+  if (kIsWeb) {
+    return FirebaseOptions(
+      apiKey: e('WEB_API_KEY') ?? (throw ArgumentError('Missing WEB_API_KEY')),
+      appId: e('WEB_APP_ID') ?? (throw ArgumentError('Missing WEB_APP_ID')),
+      messagingSenderId: e('WEB_MESSAGING_SENDER_ID') ?? (throw ArgumentError('Missing WEB_MESSAGING_SENDER_ID')),
+      projectId: e('WEB_PROJECT_ID') ?? (throw ArgumentError('Missing WEB_PROJECT_ID')),
+      authDomain: e('WEB_AUTH_DOMAIN'),
+      storageBucket: e('WEB_STORAGE_BUCKET'),
+      measurementId: e('WEB_MEASUREMENT_ID'),
+    );
+  }
+
+  switch (defaultTargetPlatform) {
+    case TargetPlatform.android:
+      return FirebaseOptions(
+        apiKey: e('ANDROID_API_KEY') ?? (throw ArgumentError('Missing ANDROID_API_KEY')),
+        appId: e('ANDROID_APP_ID') ?? (throw ArgumentError('Missing ANDROID_APP_ID')),
+        messagingSenderId: e('ANDROID_MESSAGING_SENDER_ID') ?? (throw ArgumentError('Missing ANDROID_MESSAGING_SENDER_ID')),
+        projectId: e('ANDROID_PROJECT_ID') ?? (throw ArgumentError('Missing ANDROID_PROJECT_ID')),
+        storageBucket: e('ANDROID_STORAGE_BUCKET'),
+      );
+
+    case TargetPlatform.iOS:
+      return FirebaseOptions(
+        apiKey: e('IOS_API_KEY') ?? (throw ArgumentError('Missing IOS_API_KEY')),
+        appId: e('IOS_APP_ID') ?? (throw ArgumentError('Missing IOS_APP_ID')),
+        messagingSenderId: e('IOS_MESSAGING_SENDER_ID') ?? (throw ArgumentError('Missing IOS_MESSAGING_SENDER_ID')),
+        projectId: e('IOS_PROJECT_ID') ?? (throw ArgumentError('Missing IOS_PROJECT_ID')),
+        storageBucket: e('IOS_STORAGE_BUCKET'),
+        androidClientId: e('IOS_ANDROID_CLIENT_ID'),
+        iosClientId: e('IOS_CLIENT_ID'),
+        iosBundleId: e('IOS_BUNDLE_ID'),
+      );
+
+    case TargetPlatform.macOS:
+      return FirebaseOptions(
+        apiKey: e('MACOS_API_KEY') ?? (throw ArgumentError('Missing MACOS_API_KEY')),
+        appId: e('MACOS_APP_ID') ?? (throw ArgumentError('Missing MACOS_APP_ID')),
+        messagingSenderId: e('MACOS_MESSAGING_SENDER_ID') ?? (throw ArgumentError('Missing MACOS_MESSAGING_SENDER_ID')),
+        projectId: e('MACOS_PROJECT_ID') ?? (throw ArgumentError('Missing MACOS_PROJECT_ID')),
+        storageBucket: e('MACOS_STORAGE_BUCKET'),
+        androidClientId: e('MACOS_ANDROID_CLIENT_ID'),
+        iosClientId: e('MACOS_CLIENT_ID'),
+        iosBundleId: e('MACOS_BUNDLE_ID'),
+      );
+
+    case TargetPlatform.windows:
+      return FirebaseOptions(
+        apiKey: e('WINDOWS_API_KEY') ?? (throw ArgumentError('Missing WINDOWS_API_KEY')),
+        appId: e('WINDOWS_APP_ID') ?? (throw ArgumentError('Missing WINDOWS_APP_ID')),
+        messagingSenderId: e('WINDOWS_MESSAGING_SENDER_ID') ?? (throw ArgumentError('Missing WINDOWS_MESSAGING_SENDER_ID')),
+        projectId: e('WINDOWS_PROJECT_ID') ?? (throw ArgumentError('Missing WINDOWS_PROJECT_ID')),
+        authDomain: e('WINDOWS_AUTH_DOMAIN'),
+        storageBucket: e('WINDOWS_STORAGE_BUCKET'),
+        measurementId: e('WINDOWS_MEASUREMENT_ID'),
+      );
+
+    default:
+      throw UnsupportedError('Platform not configured for Firebase in .env.');
   }
 }
 
