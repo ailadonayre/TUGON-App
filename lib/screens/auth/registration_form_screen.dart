@@ -7,8 +7,8 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/custom_textfield.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
-import 'sms_verification_screen.dart';
 import '../onboarding/login_screen.dart';
+import 'email_verification_screen.dart';
 
 class RegistrationFormScreen extends StatefulWidget {
   const RegistrationFormScreen({super.key});
@@ -56,8 +56,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
         // Navigate to SMS verification
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => SmsVerificationScreen(
-              phoneNumber: _phoneController.text.trim(),
+            builder: (_) => EmailVerificationScreen(
             ),
           ),
         );

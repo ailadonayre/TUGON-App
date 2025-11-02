@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:tugon_app/screens/user/user_dashboard_screen.dart';
 import '../../utils/colors.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_textfield.dart';
@@ -9,6 +10,7 @@ import '../auth/location_selection_screen.dart';
 import '../auth/forgot_password_screen.dart';
 import '../auth/pending_approval_screen.dart';
 import '../auth/admin_login_screen.dart';
+import '../admin/admin_dashboard_screen.dart'; // Add this import
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -41,21 +43,35 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         if (success) {
           final user = authProvider.currentUser;
-          if (user?.status == 'pending_review') {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const PendingApprovalScreen()),
-            );
-          } else if (user?.status == 'approved') {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Login successful! Dashboard coming soon.')),
+
+          // ✅ ADD THIS LOGIC - Check if admin or regular user
+          if (user?.isAdmin == true) {
+            // If user is admin, go to Admin Dashboard
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
             );
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Account status: ${user?.status ?? "unknown"}'),
-                backgroundColor: Colors.orange,
-              ),
-            );
+            // Regular user - check status
+            if (user?.status == 'approved') {
+              // Go to User Home/Dashboard
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const UserDashboardScreen()), // Or your user dashboard
+              );
+            } else if (user?.status == 'pending_review') {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const PendingApprovalScreen()),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Account status: ${user?.status ?? "unknown"}'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -76,21 +92,34 @@ class _LoginScreenState extends State<LoginScreen> {
     if (mounted) {
       if (success) {
         final user = authProvider.currentUser;
-        if (user?.status == 'pending_review') {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const PendingApprovalScreen()),
-          );
-        } else if (user?.status == 'approved') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login successful! Dashboard coming soon.')),
+
+        // ✅ ADD THIS LOGIC
+        if (user?.isAdmin == true) {
+          // Admin user
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Account status: ${user?.status ?? "unknown"}'),
-              backgroundColor: Colors.orange,
-            ),
-          );
+          // Regular user
+          if (user?.status == 'approved') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const UserDashboardScreen()),
+            );
+          } else if (user?.status == 'pending_review') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const PendingApprovalScreen()),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Account status: ${user?.status ?? "unknown"}'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -33,7 +33,7 @@ class PendingApprovalScreen extends StatelessWidget {
                   color: AppColors.goldenYellow,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 30),
               Text(
                 'Almost There!',
                 style: GoogleFonts.dmSans(
@@ -43,7 +43,7 @@ class PendingApprovalScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               Text(
                 'Your registration is under review',
                 style: GoogleFonts.dmSans(
@@ -53,7 +53,7 @@ class PendingApprovalScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -83,7 +83,7 @@ class PendingApprovalScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(

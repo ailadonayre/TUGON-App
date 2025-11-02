@@ -1,11 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'email_code_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // Use the singleton instance for google_sign_in v7+
-  // final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  final EmailCodeService _emailCodeService = EmailCodeService();
 
   User? get currentUser => _auth.currentUser;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
@@ -45,127 +46,72 @@ class AuthService {
   }
 
   // -------------------------
-  // Google Sign In (v7+ compatible)
+  // Google Sign In - CORRECTED FOR v7.2.0
   // -------------------------
-  ///
-  /// This uses `GoogleSignIn.instance.authenticate()` (interactive) and
-  /// consumes the returned ID token to build a Firebase credential.
-  /// Note: `accessToken` is not always provided by the new API unless you
-  /// explicitly request authorization/scopes; the ID token is sufficient
-  /// for Firebase Auth in most setups.
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      // Start interactive authentication. Provide common OIDC hints so an idToken is returned.
-      final GoogleSignInAccount googleUser =
-      await GoogleSignIn.instance.authenticate(
-        scopeHint: const <String>['openid', 'email', 'profile'],
+      final String? webClientId = dotenv.env['GOOGLE_WEB_CLIENT_ID'];
+
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        clientId: webClientId, // optional for web; safe to include
+        scopes: ['email', 'profile'],
       );
 
-      // If authenticate() returns, we should have an account
-      // if (googleUser == null) return null;
+      // Trigger Google Sign-In flow
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) return null; // user cancelled
 
-      // Obtain authentication tokens (in v7 this currently provides idToken)
+      // Obtain authentication details
       final GoogleSignInAuthentication googleAuth =
       await googleUser.authentication;
 
-      final String? idToken = googleAuth.idToken;
-      // accessToken may be null in v7 unless you request authorization via
-      // the authorizationClient flow; Firebase can accept an idToken alone.
-      final String? accessToken = null;
-
-      if (idToken == null) {
-        throw Exception(
-            'Google sign-in succeeded but no ID token was returned. Check your Google configuration (OAuth client IDs / serverClientId, and consent).');
-      }
-
+      // Create Firebase credential
       final OAuthCredential credential = GoogleAuthProvider.credential(
-        idToken: idToken,
-        accessToken: accessToken,
+        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken,
       );
 
-      return await _auth.signInWithCredential(credential);
-    } on Exception catch (e) {
-      // bubble up a readable error
-      throw Exception('Google sign in failed: ${e.toString()}');
+      // Sign in to Firebase
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e, st) {
+      print('Google Sign-In failed: $e\n$st');
+      throw Exception('Google Sign-In failed');
     }
   }
 
-  // -------------------------
-  // Phone: send verification code
-  // -------------------------
-  Future<String> verifyPhoneNumber(
-      String phoneNumber,
-      Function(String verificationId) codeSent,
-      Function(String error) verificationFailed,
-      ) async {
-    String verificationIdResult = '';
 
-    await _auth.verifyPhoneNumber(
-      phoneNumber: '+63${phoneNumber.substring(1)}', // Convert 09XX -> +639XX
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        // Auto-verification (Android)
-        await _auth.signInWithCredential(credential);
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        verificationFailed(_handleAuthException(e));
-      },
-      codeSent: (String verificationId, int? resendToken) {
-        verificationIdResult = verificationId;
-        codeSent(verificationId);
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {
-        verificationIdResult = verificationId;
-      },
-      timeout: const Duration(seconds: 60),
-    );
-
-    return verificationIdResult;
-  }
 
   // -------------------------
-  // Verify SMS code
+  // Send verification code via email
   // -------------------------
-  Future<UserCredential> verifyPhoneCode(
-      String verificationId,
-      String smsCode,
-      ) async {
+  Future<String> sendVerificationCode(String email) async {
     try {
-      final credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
-      return await _auth.signInWithCredential(credential);
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
-    }
-  }
-
-  // -------------------------
-  // Link phone credential to existing user
-  // -------------------------
-  Future<void> linkPhoneCredential(
-      String verificationId,
-      String smsCode,
-      ) async {
-    try {
-      final credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
-      await currentUser?.linkWithCredential(credential);
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
-    }
-  }
-
-  // -------------------------
-  // Email verification
-  // -------------------------
-  Future<void> sendEmailVerification() async {
-    try {
-      await currentUser?.sendEmailVerification();
+      final code = await _emailCodeService.storeAndSendVerificationCode(email);
+      return code;
     } catch (e) {
-      throw Exception('Failed to send verification email: ${e.toString()}');
+      throw Exception('Failed to send verification code: ${e.toString()}');
+    }
+  }
+
+  // -------------------------
+  // Verify the email code
+  // -------------------------
+  Future<bool> verifyEmailCode(String email, String code) async {
+    try {
+      return await _emailCodeService.verifyCode(email, code);
+    } catch (e) {
+      throw Exception('Failed to verify code: ${e.toString()}');
+    }
+  }
+
+  // -------------------------
+  // Resend verification code
+  // -------------------------
+  Future<String> resendVerificationCode(String email) async {
+    try {
+      return await _emailCodeService.resendCode(email);
+    } catch (e) {
+      throw Exception('Failed to resend code: ${e.toString()}');
     }
   }
 
@@ -185,12 +131,9 @@ class AuthService {
   // -------------------------
   Future<void> signOut() async {
     try {
-      await Future.wait([
-        _auth.signOut(),
-        GoogleSignIn.instance.signOut(),
-      ]);
+      await _auth.signOut();
+      await GoogleSignIn().signOut();
     } catch (e) {
-      // fallback: ensure firebase sign-out happened
       await _auth.signOut();
     }
   }
@@ -216,10 +159,6 @@ class AuthService {
         return 'Too many attempts. Please try again later.';
       case 'operation-not-allowed':
         return 'This sign-in method is not enabled.';
-      case 'invalid-verification-code':
-        return 'The verification code is invalid.';
-      case 'invalid-verification-id':
-        return 'The verification session has expired.';
       default:
         return 'An error occurred: ${e.message ?? e.code}';
     }

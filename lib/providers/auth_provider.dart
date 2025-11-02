@@ -148,23 +148,6 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Update Phone Verification
-  Future<void> updatePhoneVerification() async {
-    if (_currentUser != null) {
-      try {
-        await _firestoreService.updatePhoneVerification(
-          _currentUser!.uid,
-          _currentUser!.location,
-          true,
-        );
-        _currentUser = _currentUser!.copyWith(phoneVerified: true);
-        notifyListeners();
-      } catch (e) {
-        setError(e.toString());
-      }
-    }
-  }
-
   // Send Password Reset Email
   Future<bool> sendPasswordResetEmail(String email) async {
     try {
@@ -180,6 +163,36 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // Send Verification Code
+  Future<String?> sendVerificationCode(String email) async {
+    try {
+      final code = await _authService.sendVerificationCode(email);
+      return code;
+    } catch (e) {
+      setError(e.toString());
+      return null;
+    }
+  }
+
+// Verify Email Code
+  Future<bool> verifyEmailCode(String email, String code) async {
+    try {
+      return await _authService.verifyEmailCode(email, code);
+    } catch (e) {
+      setError(e.toString());
+      return false;
+    }
+  }
+
+// Resend Code
+  Future<String?> resendVerificationCode(String email) async {
+    try {
+      return await _authService.resendVerificationCode(email);
+    } catch (e) {
+      setError(e.toString());
+      return null;
+    }
+  }
   // Sign Out
   Future<void> signOut() async {
     try {

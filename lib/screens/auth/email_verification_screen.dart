@@ -7,27 +7,20 @@ import '../../utils/colors.dart';
 import '../../widgets/custom_button.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
-import '../../services/auth_service.dart';
 import '../../models/user_model.dart';
 import 'pending_approval_screen.dart';
 
-class SmsVerificationScreen extends StatefulWidget {
-  final String phoneNumber;
-
-  const SmsVerificationScreen({
-    super.key,
-    required this.phoneNumber,
-  });
+class EmailVerificationScreen extends StatefulWidget {
+  const EmailVerificationScreen({super.key});
 
   @override
-  State<SmsVerificationScreen> createState() => _SmsVerificationScreenState();
+  State<EmailVerificationScreen> createState() => _EmailVerificationScreenState();
 }
 
-class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
+class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   final _pinController = TextEditingController();
-  final _authService = AuthService();
 
-  String? _verificationId;
+  String? _verificationCode;
   bool _isLoading = false;
   bool _canResend = false;
   int _resendTimer = 60;
@@ -51,6 +44,10 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
     _resendTimer = 60;
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
       setState(() {
         if (_resendTimer > 0) {
           _resendTimer--;
@@ -63,38 +60,33 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
   }
 
   Future<void> _sendVerificationCode() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final email = userProvider.registrationData['email'] ?? '';
 
     try {
-      await _authService.verifyPhoneNumber(
-        widget.phoneNumber,
-            (verificationId) {
-          setState(() {
-            _verificationId = verificationId;
-            _isLoading = false;
-          });
-          _startResendTimer();
-        },
-            (error) {
-          setState(() {
-            _isLoading = false;
-          });
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(error),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        },
-      );
+      final code = await authProvider.sendVerificationCode(email);
+
+      if (code != null) {
+        setState(() {
+          _verificationCode = code;
+          _isLoading = false;
+        });
+        _startResendTimer();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✅ Verification code sent to your email!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -104,6 +96,52 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
         );
       }
     }
+  }
+
+  // DEVELOPMENT ONLY - Show code in dialog
+  // Remove this in production
+  void _showCodeDialog(String code) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Development Mode'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Your verification code is:'),
+            SizedBox(height: 16),
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.warmOrange.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                code,
+                style: GoogleFonts.dmSans(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.warmOrange,
+                  letterSpacing: 8,
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'In production, this will be sent to your email.',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _verifyCode() async {
@@ -117,57 +155,60 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
       return;
     }
 
-    if (_verificationId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Verification session expired. Please resend code.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
+    setState(() => _isLoading = true);
 
-    setState(() {
-      _isLoading = true;
-    });
-
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final email = userProvider.registrationData['email'] ?? '';
 
     try {
-      // Link phone credential to current user
-      await _authService.linkPhoneCredential(
-        _verificationId!,
-        _pinController.text,
-      );
+      final isValid = await authProvider.verifyEmailCode(email, _pinController.text);
 
-      // Create user in Firestore
-      final userData = UserModel(
-        uid: authProvider.firebaseUser!.uid,
-        fullName: userProvider.registrationData['fullName'] ?? '',
-        email: userProvider.registrationData['email'] ?? '',
-        phone: userProvider.registrationData['phone'] ?? '',
-        location: userProvider.location!,
-        status: 'pending_review',
-        phoneVerified: true,
-        emailVerified: false,
-        createdAt: DateTime.now(),
-      );
+      if (isValid) {
+        // Create user in Firestore
+        final userData = UserModel(
+          uid: authProvider.firebaseUser!.uid,
+          fullName: userProvider.registrationData['fullName'] ?? '',
+          email: email,
+          phone: userProvider.registrationData['phone'] ?? '',
+          location: userProvider.location!,
+          status: 'pending_review',
+          phoneVerified: false,
+          emailVerified: true,
+          createdAt: DateTime.now(),
+        );
 
-      final success = await authProvider.createUserInFirestore(userData);
+        final success = await authProvider.createUserInFirestore(userData);
 
-      if (mounted) {
-        if (success) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (_) => const PendingApprovalScreen(),
-            ),
-                (route) => false,
-          );
-        } else {
+        if (mounted) {
+          if (success) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('✅ Email verified successfully!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (_) => PendingApprovalScreen(),
+              ),
+                  (route) => false,
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(authProvider.error ?? 'Failed to create user'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } else {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(authProvider.error ?? 'Failed to create user'),
+            const SnackBar(
+              content: Text('❌ Invalid or expired code'),
               backgroundColor: Colors.red,
             ),
           );
@@ -184,18 +225,15 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
       }
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final maskedPhone = widget.phoneNumber.isNotEmpty
-        ? '${widget.phoneNumber.substring(0, 4)}****${widget.phoneNumber.substring(8)}'
-        : '';
+    final userProvider = Provider.of<UserProvider>(context);
+    final email = userProvider.registrationData['email'] ?? '';
 
     final defaultPinTheme = PinTheme(
       width: 56,
@@ -228,7 +266,7 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Verify Phone Number',
+                'Verify Your Email',
                 style: GoogleFonts.dmSans(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -265,7 +303,7 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.sms_outlined,
+                          Icons.email_outlined,
                           size: 60,
                           color: AppColors.warmOrange,
                         ),
@@ -280,12 +318,13 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        maskedPhone,
+                        email,
                         style: GoogleFonts.dmSans(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                           color: AppColors.softBlack,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 40),
                       Pinput(
