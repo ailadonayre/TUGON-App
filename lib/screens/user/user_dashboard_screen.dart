@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
+import '../../providers/auth_provider.dart';
 import 'user_home_screen.dart';
 import 'user_search_screen.dart';
-import 'user_report_screen.dart';
-import 'user_history_screen.dart';
+import 'user_notification_screen.dart';
 import 'user_profile_screen.dart';
+import 'create_post_screen.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   const UserDashboardScreen({super.key});
@@ -20,10 +22,66 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   final List<Widget> _screens = [
     const UserHomeScreen(),
     const UserSearchScreen(),
-    const UserReportScreen(),
-    const UserHistoryScreen(),
+    const UserNotificationScreen(),
     const UserProfileScreen(),
   ];
+
+  void _onCreatePost() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.currentUser;
+
+    if (user?.verificationStatus != 'fully_verified') {
+      _showVerificationRequiredDialog();
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const CreatePostScreen()),
+      );
+    }
+  }
+
+  void _showVerificationRequiredDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.lock_outline, color: AppColors.coralRed),
+            SizedBox(width: 8),
+            Text(
+              'Complete your profile to post',
+              style: GoogleFonts.dmSans(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Posting on the community board is available only to fully verified users. Verify your email and complete your profile to unlock this feature.',
+          style: GoogleFonts.dmSans(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: GoogleFonts.dmSans()),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() => _currentIndex = 3); // Go to profile tab
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.goldenYellow,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text('Go to Profile', style: GoogleFonts.dmSans()),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +117,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 children: [
                   _buildNavItem(0, Icons.home_rounded, 'Home', AppColors.goldenYellow),
                   _buildNavItem(1, Icons.search_rounded, 'Search', AppColors.goldenYellow),
-                  _buildNavItem(2, Icons.add_circle_rounded, 'Report', AppColors.goldenYellow, isCenter: true),
-                  _buildNavItem(3, Icons.history_rounded, 'History', AppColors.goldenYellow),
-                  _buildNavItem(4, Icons.person_rounded, 'Profile', AppColors.goldenYellow),
+                  _buildCenterPostButton(),
+                  _buildNavItem(2, Icons.notifications_rounded, 'Notifications', AppColors.goldenYellow),
+                  _buildNavItem(3, Icons.person_rounded, 'Profile', AppColors.goldenYellow),
                 ],
               ),
             ),
@@ -71,38 +129,30 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label, Color activeColor, {bool isCenter = false}) {
-    final isSelected = _currentIndex == index;
-
-    if (isCenter) {
-      return GestureDetector(
-        onTap: () => setState(() => _currentIndex = index),
-        child: Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            gradient: isSelected
-                ? AppColors.primaryGradient
-                : LinearGradient(
-              colors: [activeColor.withValues(alpha: 0.8), activeColor],
+  Widget _buildCenterPostButton() {
+    return GestureDetector(
+      onTap: _onCreatePost,
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          gradient: AppColors.primaryGradient,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.coralRed.withValues(alpha: 0.4),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
             ),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: (isSelected ? AppColors.coralRed : activeColor).withValues(alpha: 0.4),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Icon(
-            Icons.add_rounded,
-            color: AppColors.white,
-            size: 32,
-          ),
+          ],
         ),
-      );
-    }
+        child: Icon(Icons.add_rounded, color: AppColors.white, size: 32),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, String label, Color activeColor) {
+    final isSelected = _currentIndex == index;
 
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),

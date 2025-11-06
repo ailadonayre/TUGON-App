@@ -15,6 +15,7 @@ dependencies:
   firebase_core: ^4.2.0
   firebase_auth: ^6.1.1
   cloud_firestore: ^6.0.3
+  firebase_storage: ^12.3.4
   google_sign_in: ^6.1.4
   http: ^1.1.0
 
@@ -29,6 +30,7 @@ dependencies:
   # Utilities
   intl: ^0.18.1
   shared_preferences: ^2.2.2
+  image_picker: ^1.0.7
 
   # Phone & SMS
   country_code_picker: ^3.0.0
