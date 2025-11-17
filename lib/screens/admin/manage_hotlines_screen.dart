@@ -50,8 +50,6 @@ class _ManageHotlinesScreenState extends State<ManageHotlinesScreen> {
             .collection('barangays')
             .doc(barangayId)
             .collection('hotlines')
-            .orderBy('displayOrder')
-            .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -71,7 +69,19 @@ class _ManageHotlinesScreenState extends State<ManageHotlinesScreen> {
             );
           }
 
-          final hotlines = snapshot.data?.docs ?? [];
+          var hotlines = (snapshot.data?.docs ?? []).map((doc) {
+            return HotlineModel.fromMap(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            );
+          }).toList();
+
+          // Sort client-side: displayOrder, then createdAt
+          hotlines.sort((a, b) {
+            final orderCompare = a.displayOrder.compareTo(b.displayOrder);
+            if (orderCompare != 0) return orderCompare;
+            return b.createdAt.compareTo(a.createdAt);
+          });
 
           if (hotlines.isEmpty) {
             return Center(
@@ -108,11 +118,7 @@ class _ManageHotlinesScreenState extends State<ManageHotlinesScreen> {
             padding: const EdgeInsets.all(20),
             itemCount: hotlines.length,
             itemBuilder: (context, index) {
-              final hotline = HotlineModel.fromMap(
-                hotlines[index].data() as Map<String, dynamic>,
-                hotlines[index].id,
-              );
-              return _buildHotlineCard(hotline, barangayId);
+              return _buildHotlineCard(hotlines[index], barangayId);
             },
           );
         },

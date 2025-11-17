@@ -35,9 +35,6 @@ class UserHotlinesScreen extends StatelessWidget {
             .doc(barangayId)
             .collection('hotlines')
             .where('isActive', isEqualTo: true)
-            .orderBy('isEmergency', descending: true)
-            .orderBy('displayOrder')
-            .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -58,6 +55,15 @@ class UserHotlinesScreen extends StatelessWidget {
                       color: AppColors.coralRed,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${snapshot.error}',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
             );
@@ -71,7 +77,22 @@ class UserHotlinesScreen extends StatelessWidget {
             );
           }
 
-          final hotlines = snapshot.data?.docs ?? [];
+          var hotlines = (snapshot.data?.docs ?? []).map((doc) {
+            return HotlineModel.fromMap(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            );
+          }).toList();
+
+          // Sort client-side: emergency first, then by displayOrder, then by createdAt
+          hotlines.sort((a, b) {
+            if (a.isEmergency != b.isEmergency) {
+              return a.isEmergency ? -1 : 1;
+            }
+            final orderCompare = a.displayOrder.compareTo(b.displayOrder);
+            if (orderCompare != 0) return orderCompare;
+            return b.createdAt.compareTo(a.createdAt);
+          });
 
           if (hotlines.isEmpty) {
             return Center(
@@ -104,14 +125,8 @@ class UserHotlinesScreen extends StatelessWidget {
             );
           }
 
-          final emergencyHotlines = hotlines
-              .where((doc) =>
-                  (doc.data() as Map<String, dynamic>)['isEmergency'] == true)
-              .toList();
-          final regularHotlines = hotlines
-              .where((doc) =>
-                  (doc.data() as Map<String, dynamic>)['isEmergency'] != true)
-              .toList();
+          final emergencyHotlines = hotlines.where((h) => h.isEmergency).toList();
+          final regularHotlines = hotlines.where((h) => !h.isEmergency).toList();
 
           return ListView(
             padding: const EdgeInsets.all(20),
@@ -162,11 +177,7 @@ class UserHotlinesScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Emergency Hotlines
-                ...emergencyHotlines.map((doc) {
-                  final hotline = HotlineModel.fromMap(
-                    doc.data() as Map<String, dynamic>,
-                    doc.id,
-                  );
+                ...emergencyHotlines.map((hotline) {
                   return _buildHotlineCard(context, hotline, isEmergency: true);
                 }),
 
@@ -185,11 +196,7 @@ class UserHotlinesScreen extends StatelessWidget {
               ],
 
               // Regular Hotlines
-              ...regularHotlines.map((doc) {
-                final hotline = HotlineModel.fromMap(
-                  doc.data() as Map<String, dynamic>,
-                  doc.id,
-                );
+              ...regularHotlines.map((hotline) {
                 return _buildHotlineCard(context, hotline);
               }),
             ],
