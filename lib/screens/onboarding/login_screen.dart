@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tugon_app/screens/user/user_dashboard_screen.dart';
 import '../../utils/colors.dart';
-import '../../widgets/custom_button.dart';
 import '../../widgets/custom_textfield.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/location_selection_screen.dart';

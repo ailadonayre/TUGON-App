@@ -5,7 +5,6 @@ import '../../utils/colors.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_textfield.dart';
 import '../../providers/auth_provider.dart';
-import '../../services/firestore_service.dart';
 import '../admin/admin_dashboard_screen.dart';
 import 'pending_approval_screen.dart';
 
@@ -20,7 +19,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _firestoreService = FirestoreService();
   bool _obscurePassword = true;
 
   @override

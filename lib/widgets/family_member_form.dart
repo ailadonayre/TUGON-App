@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../utils/colors.dart';
 import '../../widgets/custom_textfield.dart';
-import '../../widgets/custom_button.dart';
 import '../../models/family_member_model.dart';
 
 class FamilyMemberFormDialog extends StatefulWidget {
@@ -193,7 +192,7 @@ class _FamilyMemberFormDialogState extends State<FamilyMemberFormDialog> {
 
                 // Relationship Dropdown
                 DropdownButtonFormField<String>(
-                  value: _selectedRelationship,
+                  initialValue: _selectedRelationship,
                   decoration: InputDecoration(
                     labelText: 'Relationship',
                     border: OutlineInputBorder(

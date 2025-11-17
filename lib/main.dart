@@ -12,6 +12,7 @@ import 'providers/profile_provider.dart';
 import 'providers/post_provider.dart';
 import 'providers/notification_provider.dart';
 import 'screens/onboarding/splash_screen.dart';
+import 'screens/onboarding/login_screen.dart';
 import 'utils/colors.dart';
 
 Future<void> main() async {
@@ -209,7 +210,11 @@ class MyApp extends StatelessWidget {
             color: AppColors.white,
           ),
         ),
-        home: const SplashScreen(),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const SplashScreen(),
+          '/login': (context) => const LoginScreen(),
+        },
       ),
     );
   }

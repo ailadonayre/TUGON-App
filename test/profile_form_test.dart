@@ -1,4 +1,4 @@
-import 'package:flutter/material';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:tugon_app/providers/auth_provider.dart';
@@ -16,6 +16,7 @@ void main() {
     testWidgets('Profile screen shows phone verification section',
             (WidgetTester tester) async {
           // Create a test user with partially_verified status
+          // ignore: unused_local_variable
           final testUser = UserModel(
             uid: 'test_uid',
             fullName: 'Test User',

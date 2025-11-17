@@ -21,7 +21,9 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUsers();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadUsers();
+    });
   }
 
   @override

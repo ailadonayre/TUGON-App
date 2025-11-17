@@ -7,6 +7,9 @@ import '../../providers/auth_provider.dart';
 import 'pending_approvals_screen.dart';
 import 'all_users_screen.dart';
 import 'user_statistics_screen.dart';
+import 'manage_posts_screen.dart';
+import 'manage_hotlines_screen.dart';
+import 'manage_reports_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -19,7 +22,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
   }
 
   Future<void> _loadData() async {
@@ -247,6 +252,68 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => const UserStatisticsScreen(),
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 32),
+
+                // Content Management header
+                Text(
+                  'Content Management',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.charcoalBlack,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                _buildActionCard(
+                  'Posts & Announcements',
+                  'Manage barangay posts and announcements',
+                  Icons.article_rounded,
+                  AppColors.brightBlue,
+                      () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ManagePostsScreen(),
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 12),
+
+                _buildActionCard(
+                  'Emergency Hotlines',
+                  'Manage emergency contact numbers',
+                  Icons.phone_in_talk_rounded,
+                  AppColors.coralRed,
+                      () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ManageHotlinesScreen(),
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 12),
+
+                _buildActionCard(
+                  'User Reports',
+                  'Review and respond to user-submitted reports',
+                  Icons.report_rounded,
+                  AppColors.goldenYellow,
+                      () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ManageReportsScreen(),
                       ),
                     );
                   },

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
+import '../models/post_model.dart';
+import '../models/notification_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -135,6 +137,50 @@ class FirestoreService {
       }
     } catch (e) {
       throw Exception('Failed to update profile completion: ${e.toString()}');
+    }
+  }
+
+  Future<void> updateUserProfile(
+      String uid,
+      LocationData location,
+      Map<String, dynamic> updates,
+      ) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('users')
+          .doc(uid)
+          .update(updates);
+    } catch (e) {
+      throw Exception('Failed to update user profile: ${e.toString()}');
+    }
+  }
+
+  Future<void> checkAndUpdateVerificationStatus(
+      String uid,
+      LocationData location,
+      ) async {
+    try {
+      final user = await getUserByUid(uid, location);
+      if (user == null) return;
+
+      String newStatus;
+      if (user.phoneVerified && user.profileCompleted) {
+        newStatus = 'fully_verified';
+      } else if (user.phoneVerified || user.profileCompleted) {
+        newStatus = 'partially_verified';
+      } else {
+        newStatus = 'pending_admin';
+      }
+
+      if (newStatus != user.verificationStatus) {
+        await updateVerificationStatus(uid, location, newStatus);
+      }
+    } catch (e) {
+      throw Exception('Failed to check verification status: ${e.toString()}');
     }
   }
 
@@ -406,6 +452,110 @@ class FirestoreService {
       return filtered;
     } catch (e) {
       throw Exception('Failed to search users: ${e.toString()}');
+    }
+  }
+
+  Future<List<PostModel>> getPosts(
+      LocationData location,
+      String type,
+      ) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      final snapshot = await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('posts')
+          .where('type', isEqualTo: type)
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => PostModel.fromMap(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get posts: ${e.toString()}');
+    }
+  }
+
+  Future<void> createPost(
+      PostModel post,
+      LocationData location,
+      ) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      final postsRef = _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('posts');
+
+      final docRef = postsRef.doc();
+
+      final data = post.toMap();
+      data['createdAt'] = FieldValue.serverTimestamp();
+
+      await docRef.set(data);
+    } catch (e) {
+      throw Exception('Failed to create post: ${e.toString()}');
+    }
+  }
+
+  Future<void> togglePostPin(
+      String postId,
+      LocationData location,
+      bool pinned,
+      ) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('posts')
+          .doc(postId)
+          .update({'pinned': pinned});
+    } catch (e) {
+      throw Exception('Failed to toggle post pin: ${e.toString()}');
+    }
+  }
+
+  Future<List<NotificationModel>> getNotifications(
+      LocationData location,
+      ) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      final snapshot = await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('notifications')
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => NotificationModel.fromMap(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get notifications: ${e.toString()}');
+    }
+  }
+
+  Future<void> markNotificationAsRead(
+      String notificationId,
+      LocationData location,
+      ) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('notifications')
+          .doc(notificationId)
+          .update({'read': true});
+    } catch (e) {
+      throw Exception('Failed to mark notification as read: ${e.toString()}');
     }
   }
 }

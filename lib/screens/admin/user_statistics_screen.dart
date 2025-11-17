@@ -16,7 +16,9 @@ class _UserStatisticsScreenState extends State<UserStatisticsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadStatistics();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadStatistics();
+    });
   }
 
   Future<void> _loadStatistics() async {

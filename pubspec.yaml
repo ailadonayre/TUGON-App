@@ -15,6 +15,7 @@ dependencies:
   firebase_core: ^4.2.0
   firebase_auth: ^6.1.1
   cloud_firestore: ^6.0.3
+  firebase_storage: ^13.0.3
   google_sign_in: ^6.1.4
   http: ^1.1.0
 
@@ -29,14 +30,17 @@ dependencies:
   # Utilities
   intl: ^0.18.1
   shared_preferences: ^2.2.2
+  image_picker: ^1.0.0
 
   # Phone & SMS
   country_code_picker: ^3.0.0
   pinput: ^3.0.1  # Added for SMS code input
+  url_launcher: ^6.1.10
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
 
 flutter:

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../utils/colors.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/post_provider.dart';
+import '../../models/post_model.dart';
 import '../../widgets/post_card.dart';
+import 'user_hotlines_screen.dart';
+import 'submit_report_screen.dart';
 
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
@@ -15,33 +18,20 @@ class UserHomeScreen extends StatefulWidget {
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
   @override
-  void initState() {
-    super.initState();
-    _loadPosts();
-  }
-
-  Future<void> _loadPosts() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final postProvider = Provider.of<PostProvider>(context, listen: false);
-
-    if (authProvider.currentUser != null) {
-      await postProvider.loadAllPosts(authProvider.currentUser!.location);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final postProvider = Provider.of<PostProvider>(context);
     final user = authProvider.currentUser;
+    final barangayId = user?.location.toDocumentId() ?? '';
+
+    // Debug logging
+    print('🔍 DEBUG: User: ${user?.fullName}');
+    print('🔍 DEBUG: BarangayId: $barangayId');
+    print('🔍 DEBUG: Location: ${user?.location.barangay}, ${user?.location.city}, ${user?.location.province}');
 
     return Scaffold(
       backgroundColor: AppColors.white,
-      body: RefreshIndicator(
-        onRefresh: _loadPosts,
-        color: AppColors.brightBlue,
-        child: CustomScrollView(
-          slivers: [
+      body: CustomScrollView(
+        slivers: [
             // App Bar
             SliverAppBar(
               expandedHeight: 120,
@@ -112,47 +102,48 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               ),
             ),
 
-            // Critical Announcements
-            if (postProvider.barangayPosts.any((p) => p.isCritical))
-              SliverToBoxAdapter(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.lightRed,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.coralRed, width: 2),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.warning_amber_rounded, color: AppColors.coralRed, size: 32),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'CRITICAL ADVISORY',
-                              style: GoogleFonts.dmSans(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.coralRed,
-                              ),
-                            ),
-                            Text(
-                              'Tap to view important announcements',
-                              style: GoogleFonts.dmSans(
-                                fontSize: 12,
-                                color: AppColors.charcoalBlack,
-                              ),
-                            ),
-                          ],
+            // Quick Access Menu
+            SliverToBoxAdapter(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildQuickAccessCard(
+                        context,
+                        'Emergency\nHotlines',
+                        Icons.phone_in_talk,
+                        AppColors.coralRed,
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const UserHotlinesScreen(),
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildQuickAccessCard(
+                        context,
+                        'Submit\nReport',
+                        Icons.report,
+                        AppColors.brightBlue,
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const SubmitReportScreen(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
+            ),
+
+            // Critical Announcements - Removed to avoid composite index requirement
+            // Will be shown inline with posts below
 
             // Barangay Posts Section
             SliverToBoxAdapter(
@@ -175,27 +166,168 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               ),
             ),
 
-            // Pinned Barangay Posts
-            if (postProvider.pinnedBarangayPosts.isNotEmpty)
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                    final post = postProvider.pinnedBarangayPosts[index];
-                    return PostCard(post: post, isPinned: true);
-                  },
-                  childCount: postProvider.pinnedBarangayPosts.length,
-                ),
-              ),
+            // Barangay Posts (Real-time)
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('barangays')
+                  .doc(barangayId)
+                  .collection('posts')
+                  .where('type', isEqualTo: 'barangay')
+                  .orderBy('createdAt', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                // Debug logging
+                print('🔍 DEBUG Barangay Posts: connectionState=${snapshot.connectionState}');
+                print('🔍 DEBUG Barangay Posts: hasData=${snapshot.hasData}');
+                print('🔍 DEBUG Barangay Posts: hasError=${snapshot.hasError}');
+                if (snapshot.hasError) {
+                  print('❌ DEBUG Barangay Posts ERROR: ${snapshot.error}');
+                }
+                if (snapshot.hasData) {
+                  print('🔍 DEBUG Barangay Posts: docs count=${snapshot.data!.docs.length}');
+                }
 
-            // Regular Barangay Posts
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
+                if (snapshot.hasError) {
+                  return SliverToBoxAdapter(
+                    child: Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppColors.lightRed,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Error loading posts',
+                            style: GoogleFonts.dmSans(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.coralRed,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            '${snapshot.error}',
+                            style: GoogleFonts.dmSans(
+                              fontSize: 12,
+                              color: AppColors.charcoalBlack,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SliverToBoxAdapter(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return SliverToBoxAdapter(
+                    child: Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(32),
+                      decoration: BoxDecoration(
+                        color: AppColors.lightYellow,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'No announcements yet',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.charcoalBlack,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                // Parse and sort posts client-side
+                final posts = snapshot.data!.docs.map((doc) {
+                  return PostModel.fromMap(
+                    doc.data() as Map<String, dynamic>,
+                    doc.id,
+                  );
+                }).toList();
+
+                // Sort: Critical first, then pinned, then by date
+                posts.sort((a, b) {
+                  if (a.isCritical != b.isCritical) {
+                    return a.isCritical ? -1 : 1;
+                  }
+                  if (a.pinned != b.pinned) {
+                    return a.pinned ? -1 : 1;
+                  }
+                  return b.createdAt.compareTo(a.createdAt);
+                });
+
+                // Check if there are critical posts for banner
+                final hasCritical = posts.any((p) => p.isCritical);
+
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                  final post = postProvider.regularBarangayPosts[index];
-                  return PostCard(post: post);
-                },
-                childCount: postProvider.regularBarangayPosts.length,
-              ),
+                      // Show critical banner before first post if needed
+                      if (index == 0 && hasCritical) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.lightRed,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.coralRed, width: 2),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.warning_amber_rounded, color: AppColors.coralRed, size: 32),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'CRITICAL ADVISORY',
+                                          style: GoogleFonts.dmSans(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.coralRed,
+                                          ),
+                                        ),
+                                        Text(
+                                          'See critical posts below',
+                                          style: GoogleFonts.dmSans(
+                                            fontSize: 12,
+                                            color: AppColors.charcoalBlack,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            PostCard(post: posts[index], isPinned: posts[index].pinned),
+                          ],
+                        );
+                      }
+                      final post = posts[index];
+                      return PostCard(post: post, isPinned: post.pinned);
+                    },
+                    childCount: posts.length,
+                  ),
+                );
+              },
             ),
 
             // Community Posts Section
@@ -219,55 +351,141 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               ),
             ),
 
-            // Community Posts List
-            if (postProvider.communityPosts.isEmpty)
-              SliverToBoxAdapter(
-                child: Container(
-                  margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(32),
-                  decoration: BoxDecoration(
-                    color: AppColors.lightYellow,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Icon(Icons.forum_outlined, size: 48, color: AppColors.goldenYellow),
-                        SizedBox(height: 12),
-                        Text(
-                          'No community posts yet',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.charcoalBlack,
-                          ),
+            // Community Posts (Real-time)
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('barangays')
+                  .doc(barangayId)
+                  .collection('posts')
+                  .where('type', isEqualTo: 'community')
+                  .orderBy('createdAt', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SliverToBoxAdapter(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return SliverToBoxAdapter(
+                    child: Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(32),
+                      decoration: BoxDecoration(
+                        color: AppColors.lightYellow,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Icon(Icons.forum_outlined, size: 48, color: AppColors.goldenYellow),
+                            SizedBox(height: 12),
+                            Text(
+                              'No community posts yet',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.charcoalBlack,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Be the first to share with your community!',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 14,
+                                color: AppColors.charcoalBlack.withValues(alpha: 0.7),
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Be the first to share with your community!',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 14,
-                            color: AppColors.charcoalBlack.withValues(alpha: 0.7),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
+                  );
+                }
+
+                final posts = snapshot.data!.docs.map((doc) {
+                  return PostModel.fromMap(
+                    doc.data() as Map<String, dynamic>,
+                    doc.id,
+                  );
+                }).toList();
+
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final post = posts[index];
+                      return PostCard(post: post);
+                    },
+                    childCount: posts.length,
                   ),
-                ),
-              )
-            else
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                    final post = postProvider.communityPosts[index];
-                    return PostCard(post: post);
-                  },
-                  childCount: postProvider.communityPosts.length,
-                ),
-              ),
+                );
+              },
+            ),
 
             // Bottom Padding
             SliverToBoxAdapter(child: SizedBox(height: 32)),
+          ],
+        ),
+    );
+  }
+
+  Widget _buildQuickAccessCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color,
+              color.withValues(alpha: 0.8),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.white.withValues(alpha: 0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.white,
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.dmSans(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: AppColors.white,
+                height: 1.2,
+              ),
+            ),
           ],
         ),
       ),

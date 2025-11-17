@@ -14,6 +14,7 @@ void main() {
           city: 'Test City',
           barangay: 'Test Barangay',
         ),
+        status: 'pending_review',
         createdAt: DateTime.now(),
       );
 
@@ -33,6 +34,7 @@ void main() {
           city: 'Test City',
           barangay: 'Test Barangay',
         ),
+        status: 'pending_review',
         verificationStatus: 'pending_admin',
         createdAt: DateTime.now(),
       );
@@ -54,6 +56,7 @@ void main() {
           city: 'Test City',
           barangay: 'Test Barangay',
         ),
+        status: 'approved',
         verificationStatus: 'partially_verified',
         createdAt: DateTime.now(),
       );
@@ -65,12 +68,6 @@ void main() {
       // Simulate profile completion
       user = user.copyWith(
         profileCompleted: true,
-        firstName: 'Test',
-        lastName: 'User',
-        dateOfBirth: DateTime(1990, 1, 1),
-        placeOfBirth: 'Test City',
-        houseNumber: '123',
-        streetName: 'Test Street',
       );
       expect(user.profileCompleted, isTrue);
 
@@ -93,6 +90,7 @@ void main() {
           city: 'Test City',
           barangay: 'Test Barangay',
         ),
+        status: 'approved',
         verificationStatus: 'partially_verified',
         createdAt: DateTime.now(),
       );
@@ -112,6 +110,7 @@ void main() {
           city: 'Test City',
           barangay: 'Test Barangay',
         ),
+        status: 'approved',
         verificationStatus: 'fully_verified',
         emailVerified: true,
         profileCompleted: true,

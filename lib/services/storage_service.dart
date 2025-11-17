@@ -56,4 +56,20 @@ class StorageService {
       return null;
     }
   }
+
+  Future<String> uploadReportImage(String imagePath) async {
+    try {
+      final file = File(imagePath);
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final ref = _storage.ref().child('report_images/$timestamp.jpg');
+
+      await ref.putFile(file);
+      final url = await ref.getDownloadURL();
+
+      return url;
+    } catch (e) {
+      print('Error uploading report image: $e');
+      rethrow;
+    }
+  }
 }

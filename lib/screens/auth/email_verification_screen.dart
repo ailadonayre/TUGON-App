@@ -20,7 +20,6 @@ class EmailVerificationScreen extends StatefulWidget {
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   final _pinController = TextEditingController();
 
-  String? _verificationCode;
   bool _isLoading = false;
   bool _canResend = false;
   int _resendTimer = 60;
@@ -71,7 +70,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
       if (code != null) {
         setState(() {
-          _verificationCode = code;
           _isLoading = false;
         });
         _startResendTimer();
@@ -96,52 +94,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         );
       }
     }
-  }
-
-  // DEVELOPMENT ONLY - Show code in dialog
-  // Remove this in production
-  void _showCodeDialog(String code) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Development Mode'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Your verification code is:'),
-            SizedBox(height: 16),
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.lightYellow,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                code,
-                style: GoogleFonts.dmSans(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.goldenYellow,
-                  letterSpacing: 8,
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'In production, this will be sent to your email.',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
   }
 
   Future<void> _verifyCode() async {
