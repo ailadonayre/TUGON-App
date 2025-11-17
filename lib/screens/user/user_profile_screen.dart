@@ -6,9 +6,12 @@ import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
 import '../../screens/onboarding/login_screen.dart';
 import 'phone_verification_modal.dart';
+import '../../models/user_model.dart'; // <-- import your UserModel
 
 class UserProfileScreen extends StatefulWidget {
-  const UserProfileScreen({super.key});
+  final UserModel user; // <-- add this
+
+  const UserProfileScreen({required this.user, super.key});
 
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
@@ -20,7 +23,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Future<void> _handlePhoneVerification() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final user = authProvider.currentUser;
+    final user = widget.user;
 
     if (user == null) return;
 
@@ -31,14 +34,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         phoneNumber: user.phone,
         onVerificationComplete: (success) async {
           if (success) {
-            // Update phone verification in Firestore
             await _firestoreService.updatePhoneVerification(
               user.uid,
               user.location,
               true,
             );
-
-            // Reload user data
             await authProvider.loadUserData(user.email);
           }
         },
@@ -58,12 +58,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Future<void> _markProfileComplete() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final user = authProvider.currentUser;
+    final user = widget.user;
 
     if (user == null) return;
 
-    // TODO: Add validation for all required profile fields
-    // For now, we'll just mark as complete
     setState(() => _isLoading = true);
 
     try {
@@ -73,7 +71,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         true,
       );
 
-      // Reload user data
       await authProvider.loadUserData(user.email);
 
       if (mounted) {
@@ -101,14 +98,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
-    final user = authProvider.currentUser;
-
-    if (user == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+    final user = widget.user;
 
     return Scaffold(
       appBar: AppBar(
@@ -125,6 +115,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           IconButton(
             icon: const Icon(Icons.logout, color: AppColors.coralRed),
             onPressed: () async {
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
               await authProvider.signOut();
               if (context.mounted) {
                 Navigator.of(context).pushAndRemoveUntil(
@@ -201,31 +192,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 32),
-
-            // Phone Verification Section
             _buildSectionTitle('Phone Verification'),
             const SizedBox(height: 12),
             _buildPhoneVerificationCard(user),
-
             const SizedBox(height: 24),
-
-            // Profile Information
             _buildSectionTitle('Profile Information'),
             const SizedBox(height: 12),
             _buildInfoCard(user),
-
             const SizedBox(height: 24),
-
-            // Location Information
             _buildSectionTitle('Location'),
             const SizedBox(height: 12),
             _buildLocationCard(user),
-
             const SizedBox(height: 32),
-
-            // Complete Profile Button (if needed)
             if (user.phoneVerified && !user.profileCompleted)
               SizedBox(
                 width: double.infinity,
@@ -324,9 +303,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isVerified
-            ? Colors.green.withValues(alpha: 0.05)
-            : AppColors.lightYellow,
+        color: isVerified ? Colors.green.withValues(alpha: 0.05) : AppColors.lightYellow,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isVerified ? Colors.green : AppColors.goldenYellow,
@@ -341,9 +318,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isVerified
-                      ? Colors.green.withValues(alpha: 0.1)
-                      : AppColors.lightYellow,
+                  color: isVerified ? Colors.green.withValues(alpha: 0.1) : AppColors.lightYellow,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -472,9 +447,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: user.emailVerified
-                      ? Colors.green.withValues(alpha: 0.1)
-                      : AppColors.lightRed,
+                  color: user.emailVerified ? Colors.green.withValues(alpha: 0.1) : AppColors.lightRed,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -496,9 +469,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: user.emailVerified
-                      ? Colors.green.withValues(alpha: 0.1)
-                      : AppColors.lightRed,
+                  color: user.emailVerified ? Colors.green.withValues(alpha: 0.1) : AppColors.lightRed,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(

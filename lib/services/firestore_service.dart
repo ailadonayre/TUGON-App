@@ -424,6 +424,34 @@ class FirestoreService {
   }
 
   // Search users by name or email
+  Future<List<UserModel>> getAllUsersAcrossBarangays() async {
+    final barangays = await _firestore.collection('barangays').get();
+    List<UserModel> allUsers = [];
+
+    for (var b in barangays.docs) {
+      final usersSnapshot = await b.reference.collection('users').get();
+      allUsers.addAll(
+          usersSnapshot.docs.map((doc) => UserModel.fromMap(doc.data(), doc.id))
+      );
+    }
+
+    return allUsers;
+  }
+
+  Future<List<PostModel>> getAllPostsAcrossBarangays() async {
+    final barangays = await _firestore.collection('barangays').get();
+    List<PostModel> allPosts = [];
+
+    for (var b in barangays.docs) {
+      final postsSnapshot = await b.reference.collection('posts').get();
+      allPosts.addAll(
+          postsSnapshot.docs.map((doc) => PostModel.fromMap(doc.data(), doc.id))
+      );
+    }
+
+    return allPosts;
+  }
+
   Future<List<UserModel>> searchUsers(
       LocationData location,
       String query,
