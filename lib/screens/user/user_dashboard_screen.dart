@@ -87,6 +87,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
+      floatingActionButton: _buildCenterPostButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -110,17 +112,21 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           child: BottomAppBar(
             elevation: 0,
             color: AppColors.white,
-            child: SizedBox(
-              height: 70,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildNavItem(0, Icons.home_rounded, 'Home', AppColors.goldenYellow),
-                  _buildNavItem(1, Icons.search_rounded, 'Search', AppColors.goldenYellow),
-                  _buildCenterPostButton(),
-                  _buildNavItem(2, Icons.notifications_rounded, 'Notifications', AppColors.goldenYellow),
-                  _buildNavItem(3, Icons.person_rounded, 'Profile', AppColors.goldenYellow),
-                ],
+            padding: EdgeInsets.zero,
+            child: SafeArea(
+              child: SizedBox(
+                height: 65,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildNavItem(0, Icons.home_rounded, 'Home', AppColors.goldenYellow),
+                    _buildNavItem(1, Icons.search_rounded, 'Search', AppColors.goldenYellow),
+                    SizedBox(width: 70), // Space for center button
+                    _buildNavItem(2, Icons.notifications_rounded, 'Notifs', AppColors.goldenYellow),
+                    _buildNavItem(3, Icons.person_rounded, 'Profile', AppColors.goldenYellow),
+                  ],
+                ),
               ),
             ),
           ),
@@ -154,37 +160,41 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   Widget _buildNavItem(int index, IconData icon, String label, Color activeColor) {
     final isSelected = _currentIndex == index;
 
-    return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(
-          horizontal: isSelected ? 16 : 12,
-          vertical: 8,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected ? activeColor.withValues(alpha: 0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? activeColor : Colors.grey.shade400,
-              size: isSelected ? 28 : 26,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: GoogleFonts.dmSans(
-                fontSize: 11,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+    return Flexible(
+      child: GestureDetector(
+        onTap: () => setState(() => _currentIndex = index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: EdgeInsets.symmetric(
+            horizontal: isSelected ? 12 : 8,
+            vertical: 6,
+          ),
+          decoration: BoxDecoration(
+            color: isSelected ? activeColor.withValues(alpha: 0.1) : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
                 color: isSelected ? activeColor : Colors.grey.shade400,
+                size: isSelected ? 26 : 24,
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: GoogleFonts.dmSans(
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? activeColor : Colors.grey.shade400,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ],
+          ),
         ),
       ),
     );

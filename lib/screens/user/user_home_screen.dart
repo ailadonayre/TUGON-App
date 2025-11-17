@@ -423,8 +423,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               },
             ),
 
-            // Bottom Padding
-            SliverToBoxAdapter(child: SizedBox(height: 32)),
+            // Bottom Padding - enough to clear bottom navigation bar
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: MediaQuery.of(context).padding.bottom + 80,
+              ),
+            ),
           ],
         ),
     );
