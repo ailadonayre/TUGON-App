@@ -488,14 +488,17 @@ class _ManageHotlinesScreenState extends State<ManageHotlinesScreen> {
                   controller: phoneController,
                   decoration: InputDecoration(
                     labelText: 'Phone Number',
+                    hintText: '09171234567',
+                    helperText: '11 digits required (e.g., 09171234567)',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                     prefixIcon: const Icon(Icons.phone),
                   ),
-                  keyboardType: TextInputType.phone,
+                  keyboardType: TextInputType.number,
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9\-\+\(\)\s]')),
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(11),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -577,6 +580,26 @@ class _ManageHotlinesScreenState extends State<ManageHotlinesScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Please fill in all required fields'),
+                      backgroundColor: AppColors.coralRed,
+                    ),
+                  );
+                  return;
+                }
+
+                if (phoneController.text.length != 11) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Phone number must be exactly 11 digits'),
+                      backgroundColor: AppColors.coralRed,
+                    ),
+                  );
+                  return;
+                }
+
+                if (!phoneController.text.startsWith('09')) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Phone number must start with 09'),
                       backgroundColor: AppColors.coralRed,
                     ),
                   );

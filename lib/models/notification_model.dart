@@ -4,11 +4,13 @@ class NotificationModel {
   final String id;
   final String title;
   final String body;
-  final String type; // 'announcement', 'critical', 'general'
+  final String type; // 'announcement', 'critical', 'general', 'report_update'
   final String? targetBarangay;
+  final String? userId; // For user-specific notifications
   final bool read;
   final DateTime createdAt;
   final String? postId;
+  final String? reportId;
 
   NotificationModel({
     required this.id,
@@ -16,9 +18,11 @@ class NotificationModel {
     required this.body,
     required this.type,
     this.targetBarangay,
+    this.userId,
     this.read = false,
     required this.createdAt,
     this.postId,
+    this.reportId,
   });
 
   factory NotificationModel.fromMap(Map<String, dynamic> map, String id) {
@@ -28,9 +32,11 @@ class NotificationModel {
       body: map['body'] ?? '',
       type: map['type'] ?? 'general',
       targetBarangay: map['targetBarangay'],
+      userId: map['userId'],
       read: map['read'] ?? false,
       createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       postId: map['postId'],
+      reportId: map['reportId'],
     );
   }
 
@@ -40,9 +46,11 @@ class NotificationModel {
       'body': body,
       'type': type,
       'targetBarangay': targetBarangay,
+      'userId': userId,
       'read': read,
       'createdAt': Timestamp.fromDate(createdAt),
       'postId': postId,
+      'reportId': reportId,
     };
   }
 
@@ -53,9 +61,11 @@ class NotificationModel {
       body: body,
       type: type,
       targetBarangay: targetBarangay,
+      userId: userId,
       read: read ?? this.read,
       createdAt: createdAt,
       postId: postId,
+      reportId: reportId,
     );
   }
 }

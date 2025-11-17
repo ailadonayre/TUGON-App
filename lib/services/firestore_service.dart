@@ -522,9 +522,12 @@ class FirestoreService {
 
   Future<List<NotificationModel>> getNotifications(
       LocationData location,
+      {String? userId}
       ) async {
     try {
       final barangayDocId = location.toDocumentId();
+
+      print('🔔 Fetching notifications from barangay: $barangayDocId');
 
       final snapshot = await _firestore
           .collection('barangays')
@@ -533,10 +536,24 @@ class FirestoreService {
           .orderBy('createdAt', descending: true)
           .get();
 
-      return snapshot.docs
+      print('🔔 Found ${snapshot.docs.length} total notifications in database');
+
+      var notifications = snapshot.docs
           .map((doc) => NotificationModel.fromMap(doc.data(), doc.id))
           .toList();
+
+      // If userId is provided, filter: show user-specific OR barangay-wide notifications
+      if (userId != null) {
+        print('🔔 Filtering for userId: $userId');
+        notifications = notifications
+            .where((notif) => notif.userId == null || notif.userId == userId)
+            .toList();
+        print('🔔 After filtering: ${notifications.length} notifications');
+      }
+
+      return notifications;
     } catch (e) {
+      print('❌ Error fetching notifications: $e');
       throw Exception('Failed to get notifications: ${e.toString()}');
     }
   }
@@ -556,6 +573,48 @@ class FirestoreService {
           .update({'read': true});
     } catch (e) {
       throw Exception('Failed to mark notification as read: ${e.toString()}');
+    }
+  }
+
+  /// Create a notification for a specific user or barangay-wide
+  Future<void> createNotification({
+    required LocationData location,
+    required String title,
+    required String body,
+    required String type,
+    String? userId, // If null, notification is barangay-wide
+    String? postId,
+    String? reportId,
+  }) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      print('🔔 Creating notification:');
+      print('  - Barangay: $barangayDocId');
+      print('  - Title: $title');
+      print('  - Type: $type');
+      print('  - UserId: ${userId ?? "ALL (barangay-wide)"}');
+
+      await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('notifications')
+          .add({
+        'title': title,
+        'body': body,
+        'type': type,
+        'targetBarangay': barangayDocId,
+        'userId': userId,
+        'postId': postId,
+        'reportId': reportId,
+        'read': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      print('✅ Notification created successfully');
+    } catch (e) {
+      print('❌ Error creating notification: $e');
+      throw Exception('Failed to create notification: ${e.toString()}');
     }
   }
 }

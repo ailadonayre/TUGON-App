@@ -34,11 +34,11 @@ class NotificationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadNotifications(LocationData location) async {
+  Future<void> loadNotifications(LocationData location, {String? userId}) async {
     try {
       setLoading(true);
       clearError();
-      _notifications = await _firestoreService.getNotifications(location);
+      _notifications = await _firestoreService.getNotifications(location, userId: userId);
       notifyListeners();
     } catch (e) {
       setError(e.toString());

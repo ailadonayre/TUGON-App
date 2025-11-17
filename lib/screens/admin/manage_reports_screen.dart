@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
 import '../../models/report_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/firestore_service.dart';
 
 class ManageReportsScreen extends StatefulWidget {
   const ManageReportsScreen({super.key});
@@ -562,6 +563,26 @@ class _ManageReportsScreenState extends State<ManageReportsScreen> {
                       .collection('reports')
                       .doc(report.id)
                       .update(updates);
+
+                  // Send notification to user when report is resolved
+                  if (selectedStatus == 'resolved') {
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    if (authProvider.currentUser != null) {
+                      try {
+                        await FirestoreService().createNotification(
+                          location: authProvider.currentUser!.location,
+                          title: 'Report Resolved',
+                          body: 'Your report "${report.title}" has been resolved${responseController.text.isNotEmpty ? ": ${responseController.text}" : "."}',
+                          type: 'report_update',
+                          userId: report.userId,
+                          reportId: report.id,
+                        );
+                      } catch (e) {
+                        // Log error but don't fail the update
+                        print('Failed to create notification: $e');
+                      }
+                    }
+                  }
 
                   if (mounted) {
                     Navigator.pop(context);

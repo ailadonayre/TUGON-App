@@ -99,6 +99,25 @@ class PostProvider with ChangeNotifier {
       );
 
       await _firestoreService.createPost(post, location);
+
+      // Create notification for all users when admin posts (barangay-wide)
+      if (type == 'barangay') {
+        try {
+          await _firestoreService.createNotification(
+            location: location,
+            title: isCritical ? 'Critical Announcement' : 'New Announcement',
+            body: title,
+            type: isCritical ? 'critical' : 'announcement',
+            // userId: null means notification is sent to all users in the barangay
+          );
+        } catch (e) {
+          // Log error but don't fail the post creation
+          if (kDebugMode) {
+            print('Failed to create notification: $e');
+          }
+        }
+      }
+
       await loadAllPosts(location);
 
       return true;

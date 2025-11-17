@@ -24,7 +24,18 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
     final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
 
     if (authProvider.currentUser != null) {
-      await notificationProvider.loadNotifications(authProvider.currentUser!.location);
+      print('🔔 Loading notifications for user: ${authProvider.currentUser!.uid}');
+      print('🔔 User location: ${authProvider.currentUser!.location.toDocumentId()}');
+
+      await notificationProvider.loadNotifications(
+        authProvider.currentUser!.location,
+        userId: authProvider.currentUser!.uid,
+      );
+
+      print('🔔 Loaded ${notificationProvider.notifications.length} notifications');
+      for (var notif in notificationProvider.notifications) {
+        print('  - ${notif.type}: ${notif.title} (userId: ${notif.userId})');
+      }
     }
   }
 
@@ -122,6 +133,10 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
       case 'announcement':
         typeColor = AppColors.brightBlue;
         typeIcon = Icons.campaign_rounded;
+        break;
+      case 'report_update':
+        typeColor = Colors.green;
+        typeIcon = Icons.check_circle_outline;
         break;
       default:
         typeColor = AppColors.goldenYellow;
