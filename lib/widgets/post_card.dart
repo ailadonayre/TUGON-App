@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
 import '../../models/post_model.dart';
+import '../../models/reaction_model.dart';
+import '../../providers/auth_provider.dart';
+import '../../services/reaction_service.dart';
 
 class PostCard extends StatelessWidget {
   final PostModel post;
@@ -15,12 +19,18 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.currentUser;
+    final reactionService = ReactionService();
+
     final isBarangay = post.type == 'barangay';
     final borderColor = post.isCritical
         ? AppColors.coralRed
         : isBarangay
         ? AppColors.brightBlue
         : AppColors.goldenYellow;
+
+    final canInteract = user?.isFullyVerified ?? false;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -195,13 +205,207 @@ class PostCard extends StatelessWidget {
                       post.imageUrl!,
                       width: double.infinity,
                       fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          height: 200,
+                          color: Colors.grey.shade200,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                                  : null,
+                              color: AppColors.brightBlue,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
               ],
             ),
           ),
+
+          // Reaction Bar
+          if (user != null)
+            StreamBuilder<PostReactionStats>(
+              stream: reactionService.streamReactionStats(
+                post.id,
+                user.location,
+                user.uid,
+              ),
+              builder: (context, snapshot) {
+                final stats = snapshot.data ??
+                    PostReactionStats(upvotes: 0, downvotes: 0);
+
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(16),
+                      bottomRight: Radius.circular(16),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      // Upvote Button
+                      _buildReactionButton(
+                        icon: Icons.arrow_upward_rounded,
+                        count: stats.upvotes,
+                        isActive: stats.userReaction == 'upvote',
+                        activeColor: AppColors.brightBlue,
+                        enabled: canInteract,
+                        onTap: canInteract
+                            ? () => reactionService.toggleUpvote(
+                          post.id,
+                          user.uid,
+                          user.location,
+                        )
+                            : () => _showVerificationRequired(context),
+                      ),
+                      const SizedBox(width: 16),
+
+                      // Score
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Text(
+                          '${stats.score}',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: stats.score > 0
+                                ? AppColors.brightBlue
+                                : stats.score < 0
+                                ? AppColors.coralRed
+                                : AppColors.charcoalBlack,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+
+                      // Downvote Button
+                      _buildReactionButton(
+                        icon: Icons.arrow_downward_rounded,
+                        count: stats.downvotes,
+                        isActive: stats.userReaction == 'downvote',
+                        activeColor: AppColors.coralRed,
+                        enabled: canInteract,
+                        onTap: canInteract
+                            ? () => reactionService.toggleDownvote(
+                          post.id,
+                          user.uid,
+                          user.location,
+                        )
+                            : () => _showVerificationRequired(context),
+                      ),
+                      const Spacer(),
+
+                      // Comment indicator (placeholder)
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.comment_outlined,
+                            size: 18,
+                            color: Colors.grey.shade600,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '0',
+                            style: GoogleFonts.dmSans(
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildReactionButton({
+    required IconData icon,
+    required int count,
+    required bool isActive,
+    required Color activeColor,
+    required bool enabled,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isActive ? activeColor.withValues(alpha: 0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isActive ? activeColor : Colors.grey.shade300,
+            width: isActive ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isActive
+                  ? activeColor
+                  : enabled
+                  ? Colors.grey.shade600
+                  : Colors.grey.shade400,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              count.toString(),
+              style: GoogleFonts.dmSans(
+                fontSize: 14,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                color: isActive
+                    ? activeColor
+                    : enabled
+                    ? Colors.grey.shade600
+                    : Colors.grey.shade400,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showVerificationRequired(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Complete your profile to interact with posts',
+          style: GoogleFonts.dmSans(),
+        ),
+        backgroundColor: AppColors.goldenYellow,
+        action: SnackBarAction(
+          label: 'Profile',
+          textColor: AppColors.white,
+          onPressed: () {
+            // Navigate to profile tab - handled by parent
+          },
+        ),
       ),
     );
   }

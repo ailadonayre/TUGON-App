@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Model for user-submitted reports
 class ReportModel {
   final String id;
   final String title;
   final String description;
-  final String category; // 'emergency', 'complaint', 'suggestion', 'other'
-  final String status; // 'pending', 'in_progress', 'resolved', 'rejected'
+  final String category;
+  final String status;
   final String userId;
   final String userName;
   final String barangayId;
@@ -18,7 +17,6 @@ class ReportModel {
   final String? adminResponse;
   final String? assignedToId;
   final String? assignedToName;
-  final int priority; // 1-5, 5 being highest
 
   ReportModel({
     required this.id,
@@ -37,7 +35,6 @@ class ReportModel {
     this.adminResponse,
     this.assignedToId,
     this.assignedToName,
-    this.priority = 3,
   });
 
   factory ReportModel.fromMap(Map<String, dynamic> map, String id) {
@@ -58,7 +55,6 @@ class ReportModel {
       adminResponse: map['adminResponse'],
       assignedToId: map['assignedToId'],
       assignedToName: map['assignedToName'],
-      priority: map['priority'] ?? 3,
     );
   }
 
@@ -79,7 +75,6 @@ class ReportModel {
       'adminResponse': adminResponse,
       'assignedToId': assignedToId,
       'assignedToName': assignedToName,
-      'priority': priority,
     };
   }
 
@@ -100,7 +95,6 @@ class ReportModel {
     String? adminResponse,
     String? assignedToId,
     String? assignedToName,
-    int? priority,
   }) {
     return ReportModel(
       id: id ?? this.id,
@@ -119,7 +113,6 @@ class ReportModel {
       adminResponse: adminResponse ?? this.adminResponse,
       assignedToId: assignedToId ?? this.assignedToId,
       assignedToName: assignedToName ?? this.assignedToName,
-      priority: priority ?? this.priority,
     );
   }
 }

@@ -1,18 +1,98 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'family_member_model.dart';
 
+class PersonalInformation {
+  final String firstName;
+  final String? middleName;
+  final String lastName;
+  final String? suffix;
+  final DateTime dateOfBirth;
+  final String placeOfBirth;
+  final String homeProvince;
+  final String homeCity;
+  final String homeBarangay;
+  final String currentAddress;
+  final bool is4PsRecipient;
+  final bool isIndigenousPeople;
+  final String? indigenousPeopleGroup;
+
+  PersonalInformation({
+    required this.firstName,
+    this.middleName,
+    required this.lastName,
+    this.suffix,
+    required this.dateOfBirth,
+    required this.placeOfBirth,
+    required this.homeProvince,
+    required this.homeCity,
+    required this.homeBarangay,
+    required this.currentAddress,
+    this.is4PsRecipient = false,
+    this.isIndigenousPeople = false,
+    this.indigenousPeopleGroup,
+  });
+
+  factory PersonalInformation.fromMap(Map<String, dynamic> map) {
+    return PersonalInformation(
+      firstName: map['firstName'] ?? '',
+      middleName: map['middleName'],
+      lastName: map['lastName'] ?? '',
+      suffix: map['suffix'],
+      dateOfBirth: (map['dateOfBirth'] as Timestamp).toDate(),
+      placeOfBirth: map['placeOfBirth'] ?? '',
+      homeProvince: map['homeProvince'] ?? '',
+      homeCity: map['homeCity'] ?? '',
+      homeBarangay: map['homeBarangay'] ?? '',
+      currentAddress: map['currentAddress'] ?? '',
+      is4PsRecipient: map['is4PsRecipient'] ?? false,
+      isIndigenousPeople: map['isIndigenousPeople'] ?? false,
+      indigenousPeopleGroup: map['indigenousPeopleGroup'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'firstName': firstName,
+      'middleName': middleName,
+      'lastName': lastName,
+      'suffix': suffix,
+      'dateOfBirth': Timestamp.fromDate(dateOfBirth),
+      'placeOfBirth': placeOfBirth,
+      'homeProvince': homeProvince,
+      'homeCity': homeCity,
+      'homeBarangay': homeBarangay,
+      'currentAddress': currentAddress,
+      'is4PsRecipient': is4PsRecipient,
+      'isIndigenousPeople': isIndigenousPeople,
+      'indigenousPeopleGroup': indigenousPeopleGroup,
+    };
+  }
+
+  String get fullName {
+    String name = firstName;
+    if (middleName != null && middleName!.isNotEmpty) {
+      name += ' $middleName';
+    }
+    name += ' $lastName';
+    if (suffix != null && suffix!.isNotEmpty) {
+      name += ' $suffix';
+    }
+    return name;
+  }
+}
+
 class UserModel {
   final String uid;
   final String fullName;
   final String email;
   final String phone;
   final LocationData location;
-  final String status; // 'pending_review', 'partial', 'approved', 'rejected'
+  final String status;
   final List<FamilyMember> familyMembers;
-  final bool phoneVerified; // CHANGED: Now used for full verification gating
-  final bool emailVerified; // KEPT: Used only for registration
-  final String verificationStatus; // NEW: 'pending_admin', 'partially_verified', 'fully_verified', 'suspended'
-  final bool profileCompleted; // NEW: Track if profile dashboard is completed
+  final bool emailVerified;
+  final String verificationStatus;
+  final PersonalInformation? personalInfo;
+  final String? profilePictureUrl;
   final DateTime createdAt;
   final bool isAdmin;
 
@@ -24,15 +104,14 @@ class UserModel {
     required this.location,
     required this.status,
     this.familyMembers = const [],
-    this.phoneVerified = false,
     this.emailVerified = false,
     this.verificationStatus = 'pending_admin',
-    this.profileCompleted = false,
+    this.personalInfo,
+    this.profilePictureUrl,
     required this.createdAt,
     this.isAdmin = false,
   });
 
-  // From Firestore
   factory UserModel.fromMap(Map<String, dynamic> map, String uid) {
     return UserModel(
       uid: uid,
@@ -44,16 +123,17 @@ class UserModel {
       familyMembers: ((map['familyMembers'] as List?) ?? [])
           .map((m) => FamilyMember.fromMap(m as Map<String, dynamic>))
           .toList(),
-      phoneVerified: map['phoneVerified'] ?? false,
       emailVerified: map['emailVerified'] ?? false,
       verificationStatus: map['verificationStatus'] ?? 'pending_admin',
-      profileCompleted: map['profileCompleted'] ?? false,
+      personalInfo: map['personalInfo'] != null
+          ? PersonalInformation.fromMap(map['personalInfo'] as Map<String, dynamic>)
+          : null,
+      profilePictureUrl: map['profilePictureUrl'],
       createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isAdmin: map['isAdmin'] ?? false,
     );
   }
 
-  // To Firestore
   Map<String, dynamic> toMap() {
     return {
       'fullName': fullName,
@@ -62,23 +142,23 @@ class UserModel {
       'location': location.toMap(),
       'status': status,
       'familyMembers': familyMembers.map((m) => m.toMap()).toList(),
-      'phoneVerified': phoneVerified,
       'emailVerified': emailVerified,
       'verificationStatus': verificationStatus,
-      'profileCompleted': profileCompleted,
+      'personalInfo': personalInfo?.toMap(),
+      'profilePictureUrl': profilePictureUrl,
       'createdAt': Timestamp.fromDate(createdAt),
       'isAdmin': isAdmin,
     };
   }
 
-  // Helper to check if user is fully verified
   bool get isFullyVerified {
-    return verificationStatus == 'fully_verified' &&
-        phoneVerified &&
-        profileCompleted;
+    return verificationStatus == 'fully_verified' && personalInfo != null;
   }
 
-  // Copy with
+  bool get isPartiallyVerified {
+    return verificationStatus == 'partially_verified';
+  }
+
   UserModel copyWith({
     String? uid,
     String? fullName,
@@ -87,10 +167,10 @@ class UserModel {
     LocationData? location,
     String? status,
     List<FamilyMember>? familyMembers,
-    bool? phoneVerified,
     bool? emailVerified,
     String? verificationStatus,
-    bool? profileCompleted,
+    PersonalInformation? personalInfo,
+    String? profilePictureUrl,
     DateTime? createdAt,
     bool? isAdmin,
   }) {
@@ -102,10 +182,10 @@ class UserModel {
       location: location ?? this.location,
       status: status ?? this.status,
       familyMembers: familyMembers ?? this.familyMembers,
-      phoneVerified: phoneVerified ?? this.phoneVerified,
       emailVerified: emailVerified ?? this.emailVerified,
       verificationStatus: verificationStatus ?? this.verificationStatus,
-      profileCompleted: profileCompleted ?? this.profileCompleted,
+      personalInfo: personalInfo ?? this.personalInfo,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
       createdAt: createdAt ?? this.createdAt,
       isAdmin: isAdmin ?? this.isAdmin,
     );
@@ -139,7 +219,6 @@ class LocationData {
     };
   }
 
-  // Generate document ID for Firestore
   String toDocumentId() {
     return '${province}__${city}__${barangay}'
         .replaceAll(' ', '_')

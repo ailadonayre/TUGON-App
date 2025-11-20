@@ -308,14 +308,33 @@ class _ManageReportsScreenState extends State<ManageReportsScreen> {
                     ),
                   ),
                   const Spacer(),
-                  Row(
-                    children: List.generate(
-                      5,
-                      (index) => Icon(
-                        index < report.priority ? Icons.star : Icons.star_border,
-                        size: 14,
-                        color: AppColors.goldenYellow,
-                      ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.coralRed.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.priority_high,
+                          size: 14,
+                          color: AppColors.coralRed,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'HIGH',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.coralRed,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

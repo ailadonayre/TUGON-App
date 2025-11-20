@@ -49,14 +49,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 ),
                 background: Container(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.goldenYellow.withValues(alpha: 0.1),
-                        AppColors.white,
-                      ],
-                    ),
+                    color: AppColors.goldenYellow, // solid color only
                   ),
                 ),
               ),
@@ -68,15 +61,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.brightBlue.withValues(alpha: 0.3),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
+                  color: AppColors.goldenYellow,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,24 +431,17 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              color,
-              color.withValues(alpha: 0.8),
+          decoration: BoxDecoration(
+            color: AppColors.goldenYellow, // solid color only
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.goldenYellow.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
             ],
           ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -3,102 +3,27 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
 import '../../providers/auth_provider.dart';
-import '../../services/firestore_service.dart';
 import '../../screens/onboarding/login_screen.dart';
-import 'phone_verification_modal.dart';
-import '../../models/user_model.dart'; // <-- import your UserModel
+import 'personal_info_form_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
-  final UserModel user; // <-- add this
-
-  const UserProfileScreen({required this.user, super.key});
+  const UserProfileScreen({super.key});
 
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  final _firestoreService = FirestoreService();
-  bool _isLoading = false;
-
-  Future<void> _handlePhoneVerification() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final user = widget.user;
-
-    if (user == null) return;
-
-    final result = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => PhoneVerificationModal(
-        phoneNumber: user.phone,
-        onVerificationComplete: (success) async {
-          if (success) {
-            await _firestoreService.updatePhoneVerification(
-              user.uid,
-              user.location,
-              true,
-            );
-            await authProvider.loadUserData(user.email);
-          }
-        },
-      ),
-    );
-
-    if (result == true && mounted) {
-      setState(() {});
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('✅ Phone verified! Complete your profile to unlock all features.'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    }
-  }
-
-  Future<void> _markProfileComplete() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final user = widget.user;
-
-    if (user == null) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      await _firestoreService.updateProfileCompletion(
-        user.uid,
-        user.location,
-        true,
-      );
-
-      await authProvider.loadUserData(user.email);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Profile completed!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        setState(() {});
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: AppColors.coralRed,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final user = widget.user;
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.currentUser;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -115,7 +40,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           IconButton(
             icon: const Icon(Icons.logout, color: AppColors.coralRed),
             onPressed: () async {
-              final authProvider = Provider.of<AuthProvider>(context, listen: false);
               await authProvider.signOut();
               if (context.mounted) {
                 Navigator.of(context).pushAndRemoveUntil(
@@ -141,16 +65,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       CircleAvatar(
                         radius: 50,
                         backgroundColor: AppColors.brightBlue.withValues(alpha: 0.2),
-                        child: Text(
+                        backgroundImage: user.profilePictureUrl != null
+                            ? NetworkImage(user.profilePictureUrl!)
+                            : null,
+                        child: user.profilePictureUrl == null
+                            ? Text(
                           user.fullName[0].toUpperCase(),
                           style: GoogleFonts.dmSans(
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
                             color: AppColors.brightBlue,
                           ),
-                        ),
+                        )
+                            : null,
                       ),
-                      if (user.phoneVerified)
+                      if (user.isFullyVerified)
                         Positioned(
                           bottom: 0,
                           right: 0,
@@ -192,50 +121,45 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ],
               ),
             ),
+
             const SizedBox(height: 32),
-            _buildSectionTitle('Phone Verification'),
-            const SizedBox(height: 12),
-            _buildPhoneVerificationCard(user),
-            const SizedBox(height: 24),
+
+            // Complete Profile Section
+            if (!user.isFullyVerified) ...[
+              _buildSectionTitle('Complete Your Profile'),
+              const SizedBox(height: 12),
+              _buildProfileCompletionCard(user),
+              const SizedBox(height: 24),
+            ],
+
+            // Profile Information
             _buildSectionTitle('Profile Information'),
             const SizedBox(height: 12),
             _buildInfoCard(user),
+
             const SizedBox(height: 24),
+
+            // Location Information
             _buildSectionTitle('Location'),
             const SizedBox(height: 12),
             _buildLocationCard(user),
-            const SizedBox(height: 32),
-            if (user.phoneVerified && !user.profileCompleted)
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _markProfileComplete,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.brightBlue,
-                    foregroundColor: AppColors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      color: AppColors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                      : Text(
-                    'Complete Profile',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
+
+            const SizedBox(height: 24),
+
+            // Personal Information (if completed)
+            if (user.personalInfo != null) ...[
+              _buildSectionTitle('Personal Details'),
+              const SizedBox(height: 12),
+              _buildPersonalInfoCard(user),
+              const SizedBox(height: 24),
+            ],
+
+            // Household Members (if added)
+            if (user.familyMembers.isNotEmpty) ...[
+              _buildSectionTitle('Household Members'),
+              const SizedBox(height: 12),
+              ...user.familyMembers.map((member) => _buildFamilyMemberCard(member)),
+            ],
           ],
         ),
       ),
@@ -297,16 +221,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildPhoneVerificationCard(user) {
-    final isVerified = user.phoneVerified;
+  Widget _buildProfileCompletionCard(user) {
+    final canComplete = user.verificationStatus == 'partially_verified';
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isVerified ? Colors.green.withValues(alpha: 0.05) : AppColors.lightYellow,
+        color: canComplete ? AppColors.lightYellow : AppColors.lightBlue,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isVerified ? Colors.green : AppColors.goldenYellow,
+          color: canComplete ? AppColors.goldenYellow : AppColors.brightBlue,
           width: 2,
         ),
       ),
@@ -318,102 +242,65 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isVerified ? Colors.green.withValues(alpha: 0.1) : AppColors.lightYellow,
+                  color: canComplete
+                      ? AppColors.goldenYellow.withValues(alpha: 0.2)
+                      : AppColors.brightBlue.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  isVerified ? Icons.check_circle : Icons.phone_android,
-                  color: isVerified ? Colors.green : AppColors.goldenYellow,
+                  canComplete ? Icons.edit_note : Icons.lock_outline,
+                  color: canComplete ? AppColors.goldenYellow : AppColors.brightBlue,
                   size: 24,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Phone Number',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    Text(
-                      user.phone,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.charcoalBlack,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  canComplete
+                      ? 'Complete Your Profile'
+                      : 'Waiting for Admin Approval',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.charcoalBlack,
+                  ),
                 ),
               ),
-              if (isVerified)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'Verified',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
             ],
           ),
-          if (!isVerified) ...[
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.info_outline,
-                    size: 18,
-                    color: AppColors.goldenYellow,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      user.verificationStatus == 'partially_verified'
-                          ? 'Verify your phone to unlock all features'
-                          : 'Complete admin approval first',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 12,
-                        color: AppColors.charcoalBlack,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          const SizedBox(height: 12),
+          Text(
+            canComplete
+                ? 'Fill out your personal information to unlock all features including posting and commenting.'
+                : 'Your account is being reviewed by the barangay admin. You\'ll be able to complete your profile once approved.',
+            style: GoogleFonts.dmSans(
+              fontSize: 14,
+              color: AppColors.charcoalBlack.withValues(alpha: 0.8),
+              height: 1.5,
             ),
+          ),
+          if (canComplete) ...[
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
-              height: 44,
               child: ElevatedButton.icon(
-                onPressed: user.verificationStatus == 'partially_verified'
-                    ? _handlePhoneVerification
-                    : null,
-                icon: const Icon(Icons.sms, size: 18),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const PersonalInfoFormScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.arrow_forward, size: 18),
                 label: Text(
-                  'Send SMS Code',
+                  'Complete Profile Now',
                   style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.brightBlue,
+                  backgroundColor: AppColors.goldenYellow,
                   foregroundColor: AppColors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -447,7 +334,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: user.emailVerified ? Colors.green.withValues(alpha: 0.1) : AppColors.lightRed,
+                  color: user.emailVerified
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : AppColors.lightRed,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -469,7 +358,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: user.emailVerified ? Colors.green.withValues(alpha: 0.1) : AppColors.lightRed,
+                  color: user.emailVerified
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : AppColors.lightRed,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -504,6 +395,72 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           const Divider(height: 24),
           _buildInfoRow(Icons.place, 'Barangay', user.location.barangay),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPersonalInfoCard(user) {
+    final info = user.personalInfo!;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          _buildInfoRow(Icons.person, 'Full Name', info.fullName),
+          const Divider(height: 24),
+          _buildInfoRow(
+            Icons.cake,
+            'Date of Birth',
+            '${info.dateOfBirth.day}/${info.dateOfBirth.month}/${info.dateOfBirth.year}',
+          ),
+          const Divider(height: 24),
+          _buildInfoRow(Icons.place, 'Place of Birth', info.placeOfBirth),
+          const Divider(height: 24),
+          _buildInfoRow(Icons.home, 'Current Address', info.currentAddress),
+          if (info.is4PsRecipient) ...[
+            const Divider(height: 24),
+            _buildInfoRow(Icons.family_restroom, '4Ps Status', 'Recipient'),
+          ],
+          if (info.isIndigenousPeople) ...[
+            const Divider(height: 24),
+            _buildInfoRow(
+              Icons.groups,
+              'Indigenous Group',
+              info.indigenousPeopleGroup ?? 'N/A',
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFamilyMemberCard(member) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: AppColors.lightBlue,
+          child: Text(
+            member.firstName[0].toUpperCase(),
+            style: GoogleFonts.dmSans(
+              fontWeight: FontWeight.bold,
+              color: AppColors.brightBlue,
+            ),
+          ),
+        ),
+        title: Text(
+          member.fullName,
+          style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(
+          '${member.relationship.toUpperCase()} • ${member.dateOfBirth.day}/${member.dateOfBirth.month}/${member.dateOfBirth.year}',
+          style: GoogleFonts.dmSans(fontSize: 12),
+        ),
       ),
     );
   }

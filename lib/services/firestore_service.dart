@@ -645,4 +645,29 @@ class FirestoreService {
       throw Exception('Failed to create notification: ${e.toString()}');
     }
   }
+
+  // NEW: Update personal information and verification
+  Future<void> updatePersonalInfo(
+      String uid,
+      LocationData location,
+      PersonalInformation personalInfo,
+      List<FamilyMember> householdMembers,
+      ) async {
+    try {
+      final barangayDocId = location.toDocumentId();
+
+      await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('users')
+          .doc(uid)
+          .update({
+        'personalInfo': personalInfo.toMap(),
+        'familyMembers': householdMembers.map((m) => m.toMap()).toList(),
+        'fullName': personalInfo.fullName, // Update displayed name
+      });
+    } catch (e) {
+      throw Exception('Failed to update personal info: ${e.toString()}');
+    }
+  }
 }

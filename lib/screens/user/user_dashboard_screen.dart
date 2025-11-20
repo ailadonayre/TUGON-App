@@ -50,19 +50,21 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            Icon(Icons.lock_outline, color: AppColors.coralRed),
-            const SizedBox(width: 8),
-            Text(
-              'Complete your profile to post',
-              style: GoogleFonts.dmSans(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            Icon(Icons.lock_outline, color: AppColors.goldenYellow),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Complete Your Profile',
+                style: GoogleFonts.dmSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
         ),
         content: Text(
-          'Posting on the community board is available only to fully verified users. Verify your email and complete your profile to unlock this feature.',
+          'Posting and interacting on the community board is available only to fully verified users. Complete your personal information form to unlock all features.',
           style: GoogleFonts.dmSans(fontSize: 14),
         ),
         actions: [
@@ -79,7 +81,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               backgroundColor: AppColors.goldenYellow,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: Text('Go to Profile', style: GoogleFonts.dmSans()),
+            child: Text('Complete Profile', style: GoogleFonts.dmSans()),
           ),
         ],
       ),
@@ -106,7 +108,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         width: 60,
         height: 60,
         decoration: BoxDecoration(
-          gradient: AppColors.primaryGradient,
+          color: AppColors.goldenYellow, // solid color
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -116,7 +118,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             ),
           ],
         ),
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 32),
+          child: const Icon(Icons.add_rounded, color: Colors.white, size: 32),
       ),
     );
   }

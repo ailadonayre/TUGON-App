@@ -23,7 +23,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
   final _storageService = StorageService();
 
   String _selectedCategory = 'complaint';
-  int _priority = 3;
   String? _imageUrl;
   bool _isSubmitting = false;
 
@@ -71,7 +70,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Submit a report to your barangay admin. They will review and respond to your concern.',
+                      'All reports are treated as high priority. Your barangay admin will review and respond.',
                       style: GoogleFonts.dmSans(
                         fontSize: 13,
                         color: AppColors.charcoalBlack,
@@ -188,45 +187,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Priority
-            Text(
-              'Priority Level: ${_getPriorityLabel(_priority)}',
-              style: GoogleFonts.dmSans(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.charcoalBlack,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: Slider(
-                    value: _priority.toDouble(),
-                    min: 1,
-                    max: 5,
-                    divisions: 4,
-                    activeColor: _getPriorityColor(_priority),
-                    onChanged: (value) {
-                      setState(() => _priority = value.toInt());
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Row(
-                  children: List.generate(
-                    5,
-                    (index) => Icon(
-                      index < _priority ? Icons.star : Icons.star_border,
-                      color: AppColors.goldenYellow,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
             // Image Upload (Optional)
             Text(
               'Attach Photo (Optional)',
@@ -289,20 +249,20 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
               ),
               child: _isSubmitting
                   ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        color: AppColors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  color: AppColors.white,
+                  strokeWidth: 2,
+                ),
+              )
                   : Text(
-                      'Submit Report',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                'Submit Report',
+                style: GoogleFonts.dmSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),
@@ -340,29 +300,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
         color: isSelected ? AppColors.brightBlue : Colors.grey.shade300,
       ),
     );
-  }
-
-  String _getPriorityLabel(int priority) {
-    switch (priority) {
-      case 1:
-        return 'Low';
-      case 2:
-        return 'Medium-Low';
-      case 3:
-        return 'Medium';
-      case 4:
-        return 'Medium-High';
-      case 5:
-        return 'High';
-      default:
-        return 'Medium';
-    }
-  }
-
-  Color _getPriorityColor(int priority) {
-    if (priority <= 2) return Colors.green;
-    if (priority <= 3) return AppColors.goldenYellow;
-    return AppColors.coralRed;
   }
 
   Future<void> _pickImage() async {
@@ -413,7 +350,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
         location: _locationController.text.trim().isEmpty
             ? null
             : _locationController.text.trim(),
-        priority: _priority,
         createdAt: DateTime.now(),
       );
 
@@ -427,8 +363,8 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Report submitted successfully!'),
-            backgroundColor: AppColors.brightBlue,
+            content: Text('✅ Report submitted successfully!'),
+            backgroundColor: Colors.green,
           ),
         );
       }
