@@ -4,13 +4,14 @@ class NotificationModel {
   final String id;
   final String title;
   final String body;
-  final String type; // 'announcement', 'critical', 'general', 'report_update'
+  final String type; // 'announcement', 'critical', 'general', 'report_update', 'appointment_update'
   final String? targetBarangay;
   final String? userId; // For user-specific notifications
   final bool read;
   final DateTime createdAt;
   final String? postId;
   final String? reportId;
+  final String? appointmentId; // --- 1. ADD THIS LINE ---
 
   NotificationModel({
     required this.id,
@@ -23,6 +24,7 @@ class NotificationModel {
     required this.createdAt,
     this.postId,
     this.reportId,
+    this.appointmentId, // --- 2. ADD THIS TO THE CONSTRUCTOR ---
   });
 
   factory NotificationModel.fromMap(Map<String, dynamic> map, String id) {
@@ -37,6 +39,7 @@ class NotificationModel {
       createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       postId: map['postId'],
       reportId: map['reportId'],
+      appointmentId: map['appointmentId'], // --- 3. ADD THIS LINE ---
     );
   }
 
@@ -51,6 +54,7 @@ class NotificationModel {
       'createdAt': Timestamp.fromDate(createdAt),
       'postId': postId,
       'reportId': reportId,
+      'appointmentId': appointmentId, // --- 4. ADD THIS LINE ---
     };
   }
 
@@ -66,6 +70,7 @@ class NotificationModel {
       createdAt: createdAt,
       postId: postId,
       reportId: reportId,
+      appointmentId: appointmentId, // --- 5. ADD THIS LINE ---
     );
   }
 }

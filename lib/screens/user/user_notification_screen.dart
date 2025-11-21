@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/notification_provider.dart';
+// --- 1. IMPORT THE TRACKER SCREEN FOR NAVIGATION ---
+import 'user_reports_tracker_screen.dart';
 
 class UserNotificationScreen extends StatefulWidget {
   const UserNotificationScreen({super.key});
@@ -24,18 +26,10 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
     final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
 
     if (authProvider.currentUser != null) {
-      print('🔔 Loading notifications for user: ${authProvider.currentUser!.uid}');
-      print('🔔 User location: ${authProvider.currentUser!.location.toDocumentId()}');
-
       await notificationProvider.loadNotifications(
         authProvider.currentUser!.location,
         userId: authProvider.currentUser!.uid,
       );
-
-      print('🔔 Loaded ${notificationProvider.notifications.length} notifications');
-      for (var notif in notificationProvider.notifications) {
-        print('  - ${notif.type}: ${notif.title} (userId: ${notif.userId})');
-      }
     }
   }
 
@@ -125,6 +119,7 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
     Color typeColor;
     IconData typeIcon;
 
+    // --- 2. ADD THE NEW CASE FOR APPOINTMENT UPDATES ---
     switch (notification.type) {
       case 'critical':
         typeColor = AppColors.coralRed;
@@ -138,29 +133,44 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
         typeColor = Colors.green;
         typeIcon = Icons.check_circle_outline;
         break;
+      case 'appointment_update': // This is the new case
+        typeColor = Colors.purple;
+        typeIcon = Icons.document_scanner_rounded;
+        break;
       default:
         typeColor = AppColors.goldenYellow;
         typeIcon = Icons.info_outline;
     }
 
     return Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-            color: notification.read ? AppColors.white : typeColor.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: notification.read
-                ? Colors.grey.shade200
-                : typeColor.withValues(alpha: 0.3),
-            width: notification.read ? 1 : 2,
-          ),
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: notification.read ? AppColors.white : typeColor.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: notification.read
+              ? Colors.grey.shade200
+              : typeColor.withOpacity(0.3),
+          width: notification.read ? 1 : 2,
         ),
+      ),
       child: InkWell(
+        // --- 3. ADD NAVIGATION LOGIC TO ONTAP ---
         onTap: () async {
           if (!notification.read) {
             await notificationProvider.markAsRead(
               notification.id,
               authProvider.currentUser!.location,
+            );
+          }
+
+          // Navigate to tracker screen for relevant notification types
+          if (notification.type == 'report_update' || notification.type == 'appointment_update') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const UserReportsTrackerScreen(),
+              ),
             );
           }
         },
@@ -173,7 +183,7 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: typeColor.withValues(alpha: 0.15),
+                  color: typeColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(typeIcon, color: typeColor, size: 24),
@@ -196,7 +206,7 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
                       notification.body,
                       style: GoogleFonts.dmSans(
                         fontSize: 14,
-                        color: AppColors.charcoalBlack.withValues(alpha: 0.7),
+                        color: AppColors.charcoalBlack.withOpacity(0.7),
                         height: 1.4,
                       ),
                       maxLines: 3,
@@ -215,6 +225,7 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
               ),
               if (!notification.read)
                 Container(
+                  margin: const EdgeInsets.only(left: 8),
                   width: 10,
                   height: 10,
                   decoration: BoxDecoration(

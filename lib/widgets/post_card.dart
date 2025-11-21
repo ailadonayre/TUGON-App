@@ -251,65 +251,45 @@ class PostCard extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      // Upvote Button
-                      _buildReactionButton(
-                        icon: Icons.arrow_upward_rounded,
-                        count: stats.upvotes,
-                        isActive: stats.userReaction == 'upvote',
-                        activeColor: AppColors.brightBlue,
-                        enabled: canInteract,
-                        onTap: canInteract
-                            ? () => reactionService.toggleUpvote(
-                          post.id,
-                          user.uid,
-                          user.location,
-                        )
-                            : () => _showVerificationRequired(context),
-                      ),
-                      const SizedBox(width: 16),
-
-                      // Score
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: Text(
-                          '${stats.score}',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: stats.score > 0
-                                ? AppColors.brightBlue
-                                : stats.score < 0
-                                ? AppColors.coralRed
-                                : AppColors.charcoalBlack,
+                      // --- THIS IS THE FIX ---
+                      // Group the two reaction buttons together in their own Row.
+                      Row(
+                        children: [
+                          // Upvote Button
+                          _buildReactionButton(
+                            icon: Icons.arrow_upward_rounded,
+                            count: stats.upvotes,
+                            isActive: stats.userReaction == 'upvote',
+                            activeColor: AppColors.brightBlue,
+                            enabled: canInteract,
+                            onTap: canInteract
+                                ? () => reactionService.toggleUpvote(
+                              post.id,
+                              user.uid,
+                              user.location,
+                            )
+                                : () => _showVerificationRequired(context),
                           ),
-                        ),
+                          const SizedBox(width: 16), // Space between upvote and downvote
+                          // Downvote Button
+                          _buildReactionButton(
+                            icon: Icons.arrow_downward_rounded,
+                            count: stats.downvotes,
+                            isActive: stats.userReaction == 'downvote',
+                            activeColor: AppColors.coralRed,
+                            enabled: canInteract,
+                            onTap: canInteract
+                                ? () => reactionService.toggleDownvote(
+                              post.id,
+                              user.uid,
+                              user.location,
+                            )
+                                : () => _showVerificationRequired(context),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 16),
-
-                      // Downvote Button
-                      _buildReactionButton(
-                        icon: Icons.arrow_downward_rounded,
-                        count: stats.downvotes,
-                        isActive: stats.userReaction == 'downvote',
-                        activeColor: AppColors.coralRed,
-                        enabled: canInteract,
-                        onTap: canInteract
-                            ? () => reactionService.toggleDownvote(
-                          post.id,
-                          user.uid,
-                          user.location,
-                        )
-                            : () => _showVerificationRequired(context),
-                      ),
-                      const Spacer(),
+                      const Spacer(), // This pushes the comment icon to the right
+                      // --- END OF FIX ---
 
                       // Comment indicator (placeholder)
                       Row(
