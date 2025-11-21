@@ -14,14 +14,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "77868161415-nmp0gisd6c6bmf6jo6mjvnheai4cn3l8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "TUGON.com",
-            "certificate_hash": "3d34b360a490c9b13a3ff04cdb9c71462a30d95b"
-          }
-        },
-        {
           "client_id": "77868161415-mmrsm31iv4p3q01vvd4abcmhdfhfdg2b.apps.googleusercontent.com",
           "client_type": 3
         }
