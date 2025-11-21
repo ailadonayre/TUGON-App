@@ -68,32 +68,6 @@ class FirestoreService {
     }
   }
 
-  // NEW: Update phone verification status
-  Future<void> updatePhoneVerification(
-      String uid,
-      LocationData location,
-      bool verified,
-      ) async {
-    try {
-      final barangayDocId = location.toDocumentId();
-
-      await _firestore
-          .collection('barangays')
-          .doc(barangayDocId)
-          .collection('users')
-          .doc(uid)
-          .update({'phoneVerified': verified});
-
-      // Check if user should become fully_verified
-      final user = await getUserByUid(uid, location);
-      if (user != null && verified && user.profileCompleted) {
-        await updateVerificationStatus(uid, location, 'fully_verified');
-      }
-    } catch (e) {
-      throw Exception('Failed to update phone verification: ${e.toString()}');
-    }
-  }
-
   // NEW: Update verification status
   Future<void> updateVerificationStatus(
       String uid,
@@ -130,9 +104,8 @@ class FirestoreService {
           .doc(uid)
           .update({'profileCompleted': completed});
 
-      // Check if user should become fully_verified
-      final user = await getUserByUid(uid, location);
-      if (user != null && completed && user.phoneVerified) {
+      // SIMPLIFIED: Just check profileCompleted
+      if (completed) {
         await updateVerificationStatus(uid, location, 'fully_verified');
       }
     } catch (e) {
@@ -168,9 +141,9 @@ class FirestoreService {
       if (user == null) return;
 
       String newStatus;
-      if (user.phoneVerified && user.profileCompleted) {
+      if (user.profileCompleted) {  // REMOVED: && user.phoneVerified
         newStatus = 'fully_verified';
-      } else if (user.phoneVerified || user.profileCompleted) {
+      } else if (user.profileCompleted) {  // REMOVED: || user.phoneVerified
         newStatus = 'partially_verified';
       } else {
         newStatus = 'pending_admin';

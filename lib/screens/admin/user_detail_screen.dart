@@ -122,7 +122,7 @@ class UserDetailScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
+                color: AppColors.goldenYellow,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
@@ -223,7 +223,6 @@ class UserDetailScreen extends StatelessWidget {
               'Verification Status',
               [
                 _buildVerificationTile('Email Verified', user.emailVerified),
-                _buildVerificationTile('Phone Verified', user.phoneVerified),
               ],
             ),
 

@@ -90,6 +90,7 @@ class UserModel {
   final String status;
   final List<FamilyMember> familyMembers;
   final bool emailVerified;
+  final bool profileCompleted;
   final String verificationStatus;
   final PersonalInformation? personalInfo;
   final String? profilePictureUrl;
@@ -105,6 +106,7 @@ class UserModel {
     required this.status,
     this.familyMembers = const [],
     this.emailVerified = false,
+    this.profileCompleted = false,
     this.verificationStatus = 'pending_admin',
     this.personalInfo,
     this.profilePictureUrl,
@@ -124,6 +126,7 @@ class UserModel {
           .map((m) => FamilyMember.fromMap(m as Map<String, dynamic>))
           .toList(),
       emailVerified: map['emailVerified'] ?? false,
+      profileCompleted: map['profileCompleted'] ?? false,
       verificationStatus: map['verificationStatus'] ?? 'pending_admin',
       personalInfo: map['personalInfo'] != null
           ? PersonalInformation.fromMap(map['personalInfo'] as Map<String, dynamic>)
@@ -143,6 +146,7 @@ class UserModel {
       'status': status,
       'familyMembers': familyMembers.map((m) => m.toMap()).toList(),
       'emailVerified': emailVerified,
+      'profileCompleted': profileCompleted,
       'verificationStatus': verificationStatus,
       'personalInfo': personalInfo?.toMap(),
       'profilePictureUrl': profilePictureUrl,
@@ -168,6 +172,7 @@ class UserModel {
     String? status,
     List<FamilyMember>? familyMembers,
     bool? emailVerified,
+    bool? profileCompleted,
     String? verificationStatus,
     PersonalInformation? personalInfo,
     String? profilePictureUrl,
@@ -183,6 +188,7 @@ class UserModel {
       status: status ?? this.status,
       familyMembers: familyMembers ?? this.familyMembers,
       emailVerified: emailVerified ?? this.emailVerified,
+      profileCompleted: profileCompleted ?? this.profileCompleted,
       verificationStatus: verificationStatus ?? this.verificationStatus,
       personalInfo: personalInfo ?? this.personalInfo,
       profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,

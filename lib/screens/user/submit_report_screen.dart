@@ -363,7 +363,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✅ Report submitted successfully!'),
+            content: Text('Report submitted successfully!'),
             backgroundColor: Colors.green,
           ),
         );

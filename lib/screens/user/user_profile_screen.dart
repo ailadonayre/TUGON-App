@@ -166,6 +166,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
+  // DELETE the entire _buildPhoneVerificationCard method
+// DELETE any phone verification button handlers
+// DELETE references to phoneVerified in the build method
+
+// Update the verification badge to only check profileCompleted:
   Widget _buildVerificationBadge(user) {
     Color badgeColor;
     String badgeText;

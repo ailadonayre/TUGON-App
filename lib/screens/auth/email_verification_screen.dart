@@ -125,7 +125,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           phone: userProvider.registrationData['phone'] ?? '',
           location: userProvider.location!,
           status: 'pending_review',
-          phoneVerified: false,
           emailVerified: true,
           createdAt: DateTime.now(),
         );

@@ -87,10 +87,8 @@ class _ManageReportsScreenState extends State<ManageReportsScreen> {
                   );
                 }).toList();
 
-                // Sort client-side: priority (high to low), then createdAt (newest first)
+                // Sort client-side: by createdAt (newest first)
                 reports.sort((a, b) {
-                  final priorityCompare = b.priority.compareTo(a.priority);
-                  if (priorityCompare != 0) return priorityCompare;
                   return b.createdAt.compareTo(a.createdAt);
                 });
 
@@ -314,27 +312,16 @@ class _ManageReportsScreenState extends State<ManageReportsScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.coralRed.withValues(alpha: 0.1),
+                      color: _getCategoryColor(report.category).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.priority_high,
-                          size: 14,
-                          color: AppColors.coralRed,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'HIGH',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.coralRed,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      report.category.toUpperCase(),
+                      style: GoogleFonts.dmSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: _getCategoryColor(report.category),
+                      ),
                     ),
                   ),
                 ],
