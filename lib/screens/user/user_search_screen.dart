@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import '../../models/user_model.dart';
 import '../../models/post_model.dart';
 import '../../services/firestore_service.dart';
-import 'user_profile_screen.dart';
+import '../admin/user_detail_screen.dart';  // ADD THIS LINE - for viewing other users' profiles
 
 class PostDetailScreen extends StatelessWidget {
   final PostModel post;
@@ -269,7 +269,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => UserProfileScreen(user: item)),
+                          MaterialPageRoute(builder: (_) => UserDetailScreen(user: item)),  // FIXED: Changed from UserProfileScreen to UserDetailScreen
                         );
                       },
                     ),
@@ -347,5 +347,3 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
     );
   }
 }
-
-

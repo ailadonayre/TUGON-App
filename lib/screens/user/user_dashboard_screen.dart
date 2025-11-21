@@ -3,13 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
 import '../../providers/auth_provider.dart';
-import '../../models/user_model.dart'; // <-- add this
 import 'user_home_screen.dart';
 import 'user_search_screen.dart';
 import 'user_notification_screen.dart';
 import 'user_profile_screen.dart';
 import 'create_post_screen.dart';
-
 
 class UserDashboardScreen extends StatefulWidget {
   const UserDashboardScreen({super.key});
@@ -21,19 +19,19 @@ class UserDashboardScreen extends StatefulWidget {
 class _UserDashboardScreenState extends State<UserDashboardScreen> {
   int _currentIndex = 0;
 
-  // Convert _screens into a method so we can pass the current user dynamically
-  List<Widget> _screens(UserModel? currentUser) => [
-    const UserHomeScreen(),
-    const UserSearchScreen(),
-    const UserNotificationScreen(),
-    if (currentUser != null) UserProfileScreen(user: currentUser),
+  // Screens list - current user is fetched dynamically inside each screen if needed
+  List<Widget> _screens() => const [
+    UserHomeScreen(),
+    UserSearchScreen(),
+    UserNotificationScreen(),
+    UserProfileScreen(), // No 'user' parameter
   ];
 
   void _onCreatePost() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final user = authProvider.currentUser;
 
-    if (user?.verificationStatus != 'fully_verified') {
+    if (user?.status != 'approved') {
       _showVerificationRequiredDialog();
     } else {
       Navigator.push(
@@ -44,17 +42,37 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   }
 
   void _showVerificationRequiredDialog() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.currentUser;
+
+    String message;
+    String statusLabel;
+
+    if (user?.status == 'pending_review') {
+      statusLabel = 'Pending Admin Approval';
+      message =
+      'Your account is awaiting approval from the barangay admin. You will be able to post once your account is approved.';
+    } else if (user?.status == 'rejected') {
+      statusLabel = 'Account Rejected';
+      message =
+      'Your account registration was rejected. Please contact your barangay office for more information.';
+    } else {
+      statusLabel = 'Verification Required';
+      message =
+      'Complete your profile verification to unlock community posting features.';
+    }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            Icon(Icons.lock_outline, color: AppColors.goldenYellow),
-            SizedBox(width: 8),
+            Icon(Icons.lock_outline, color: AppColors.coralRed),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Complete Your Profile',
+                statusLabel,
                 style: GoogleFonts.dmSans(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -64,7 +82,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           ],
         ),
         content: Text(
-          'Posting and interacting on the community board is available only to fully verified users. Complete your personal information form to unlock all features.',
+          message,
           style: GoogleFonts.dmSans(fontSize: 14),
         ),
         actions: [
@@ -79,9 +97,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.goldenYellow,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
-            child: Text('Complete Profile', style: GoogleFonts.dmSans()),
+            child: Text(
+                user?.status == 'pending_review' ? 'View Status' : 'Go to Profile',
+                style: GoogleFonts.dmSans()),
           ),
         ],
       ),
@@ -90,11 +111,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
-    final currentUser = authProvider.currentUser;
-
     return Scaffold(
-      body: _screens(currentUser)[_currentIndex],
+      body: _screens()[_currentIndex],
       floatingActionButton: _buildCenterPostButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: _buildBottomNavBar(),
@@ -118,7 +136,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             ),
           ],
         ),
-          child: const Icon(Icons.add_rounded, color: Colors.white, size: 32),
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 32),
       ),
     );
   }
