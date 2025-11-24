@@ -1,75 +1,82 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
 
 class StorageService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final ImagePicker _picker = ImagePicker();
-
-  // TODO: Configure your Firebase Storage bucket in Firebase Console
-  // This is a placeholder implementation
+  final Box _userProfileBox = Hive.box('user_profile');
 
   Future<String?> uploadProfilePicture(String userId) async {
     try {
-      final XFile? image = await _picker.pickImage(
+      final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
-        maxWidth: 512,
-        maxHeight: 512,
-        imageQuality: 75,
-      );
-
-      if (image == null) return null;
-
-      final file = File(image.path);
-      final ref = _storage.ref().child('profile_pictures/$userId.jpg');
-
-      await ref.putFile(file);
-      final url = await ref.getDownloadURL();
-
-      return url;
-    } catch (e) {
-      print('Error uploading profile picture: $e');
-      return null;
-    }
-  }
-
-  Future<String?> uploadPostImage(String postId) async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
+        imageQuality: 50,
         maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
       );
 
-      if (image == null) return null;
+      if (pickedFile == null) {
+        print('No image selected.');
+        return null;
+      }
 
-      final file = File(image.path);
-      final ref = _storage.ref().child('post_images/$postId.jpg');
+      const int maxFileSize = 2 * 1024 * 1024;
+      final int fileSize = await pickedFile.length();
 
-      await ref.putFile(file);
-      final url = await ref.getDownloadURL();
+      if (fileSize > maxFileSize) {
+        throw Exception(
+            'Image is too large. Please select an image smaller than 2 MB.');
+      }
 
-      return url;
+      final imageBytes = await pickedFile.readAsBytes();
+
+      await _userProfileBox.put('profile_image', imageBytes);
+
+      final ref = _storage.ref().child('profile_pictures').child('$userId.jpg');
+      final uploadTask = await ref.putFile(File(pickedFile.path));
+      final downloadUrl = await uploadTask.ref.getDownloadURL();
+
+      return downloadUrl;
+
+    } on FirebaseException catch (e) {
+      throw Exception('Error uploading profile picture: ${e.message}');
     } catch (e) {
-      print('Error uploading post image: $e');
-      return null;
+      throw Exception(e.toString());
     }
   }
 
-  Future<String> uploadReportImage(String imagePath) async {
+  Future<String> uploadReportImage(String path) async {
     try {
-      final file = File(imagePath);
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final ref = _storage.ref().child('report_images/$timestamp.jpg');
+      final file = File(path);
+      if (!await file.exists()) {
+        throw Exception('File does not exist at path: $path');
+      }
 
-      await ref.putFile(file);
-      final url = await ref.getDownloadURL();
+      const int maxFileSize = 5 * 1024 * 1024;
+      final int fileSize = await file.length();
 
-      return url;
+      if (fileSize > maxFileSize) {
+        throw Exception(
+            'Report image is too large. Please select an image smaller than 5 MB.');
+      }
+
+      final String fileName =
+          '${DateTime.now().millisecondsSinceEpoch}-${p.basename(path)}';
+
+      final ref = _storage.ref().child('report_images').child(fileName);
+
+      final uploadTask = await ref.putFile(file);
+
+      final String downloadUrl = await uploadTask.ref.getDownloadURL();
+
+      return downloadUrl;
+
+    } on FirebaseException catch (e) {
+      throw Exception('Error uploading report image: ${e.message}');
     } catch (e) {
-      print('Error uploading report image: $e');
-      rethrow;
+      throw Exception(e.toString());
     }
   }
 }

@@ -2,11 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
+import '../services/storage_service.dart';
 import '../models/user_model.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
   final FirestoreService _firestoreService = FirestoreService();
+  final StorageService _storageService = StorageService();
 
   User? _firebaseUser;
   UserModel? _currentUser;
@@ -22,6 +24,9 @@ class AuthProvider with ChangeNotifier {
   AuthProvider() {
     _authService.authStateChanges.listen((User? user) {
       _firebaseUser = user;
+      if (user != null && user.email != null) {
+        loadUserData(user.email!);
+      }
       notifyListeners();
     });
   }
@@ -39,6 +44,34 @@ class AuthProvider with ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  Future<void> updateUserProfilePicture() async {
+    if (_currentUser == null || _currentUser!.uid.isEmpty) {
+      throw Exception('No user is currently signed in.');
+    }
+
+    try {
+      setLoading(true);
+      clearError();
+
+      final downloadUrl = await _storageService.uploadProfilePicture(_currentUser!.uid);
+
+      if (downloadUrl == null) {
+        setLoading(false);
+        return;
+      }
+
+      await _firestoreService.updateUserProfilePicture(_currentUser!.uid, downloadUrl);
+
+      _currentUser = _currentUser!.copyWith(profilePictureUrl: downloadUrl);
+
+    } catch (e) {
+      setError(e.toString());
+      rethrow;
+    } finally {
+      setLoading(false);
+    }
   }
 
   // Sign Up with Email & Password
@@ -79,10 +112,6 @@ class AuthProvider with ChangeNotifier {
       );
 
       if (userCredential.user != null) {
-        // Load user data from Firestore
-        final userData = await _firestoreService.findUserByEmail(email);
-        _currentUser = userData;
-        notifyListeners();
         return true;
       }
       return false;
@@ -103,14 +132,12 @@ class AuthProvider with ChangeNotifier {
       final userCredential = await _authService.signInWithGoogle();
 
       if (userCredential?.user != null) {
-        final userData = await _firestoreService.findUserByEmail(
-          userCredential!.user!.email!,
-        );
-        _currentUser = userData;
-        notifyListeners();
-        return true;
+        final userExists = await _firestoreService.findUserByEmail(userCredential!.user!.email!) != null;
+        if (userExists) {
+          return true;
+        }
       }
-      return false;
+      return true;
     } catch (e) {
       setError(e.toString());
       return false;
@@ -144,7 +171,7 @@ class AuthProvider with ChangeNotifier {
       _currentUser = userData;
       notifyListeners();
     } catch (e) {
-      setError(e.toString());
+      debugPrint("Failed to auto-load user data: $e");
     }
   }
 
@@ -174,7 +201,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-// Verify Email Code
+  // Verify Email Code
   Future<bool> verifyEmailCode(String email, String code) async {
     try {
       return await _authService.verifyEmailCode(email, code);
@@ -184,7 +211,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-// Resend Code
+  // Resend Code
   Future<String?> resendVerificationCode(String email) async {
     try {
       return await _authService.resendVerificationCode(email);
@@ -193,6 +220,7 @@ class AuthProvider with ChangeNotifier {
       return null;
     }
   }
+
   // Sign Out
   Future<void> signOut() async {
     try {

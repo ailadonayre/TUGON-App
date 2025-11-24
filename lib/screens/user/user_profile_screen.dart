@@ -1,6 +1,11 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+
+import '../../models/family_member_model.dart';
+import '../../models/user_model.dart';
 import '../../utils/colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../screens/onboarding/login_screen.dart';
@@ -14,164 +19,179 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
+  Uint8List? _profileImage;
+  late final Box _userProfileBox;
+
+  @override
+  void initState() {
+    super.initState();
+    _userProfileBox = Hive.box('user_profile');
+    _loadProfileImage();
+  }
+
+  Future<void> _loadProfileImage() async {
+    final imageData = _userProfileBox.get('profile_image');
+    if (imageData != null && imageData is Uint8List && mounted) {
+      setState(() {
+        _profileImage = imageData;
+      });
+    }
+  }
+
+  Future<void> _updateProfilePicture() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Processing...')),
+    );
+
+    try {
+      await authProvider.updateUserProfilePicture();
+
+      await _loadProfileImage();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile picture updated!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update picture: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
-    final user = authProvider.currentUser;
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        final user = authProvider.currentUser;
 
-    if (user == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+        if (user == null) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Profile',
-          style: GoogleFonts.dmSans(
-            fontWeight: FontWeight.bold,
-            color: AppColors.charcoalBlack,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: AppColors.coralRed),
-            onPressed: () async {
-              await authProvider.signOut();
-              if (context.mounted) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (route) => false,
-                );
-              }
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile Header
-            Center(
-              child: Column(
-                children: [
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundColor: AppColors.brightBlue.withValues(alpha: 0.2),
-                        backgroundImage: user.profilePictureUrl != null
-                            ? NetworkImage(user.profilePictureUrl!)
-                            : null,
-                        child: user.profilePictureUrl == null
-                            ? Text(
-                          user.fullName[0].toUpperCase(),
-                          style: GoogleFonts.dmSans(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.brightBlue,
-                          ),
-                        )
-                            : null,
-                      ),
-                      if (user.isFullyVerified)
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: const Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    user.fullName,
-                    style: GoogleFonts.dmSans(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.charcoalBlack,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    user.email,
-                    style: GoogleFonts.dmSans(
-                      fontSize: 14,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildVerificationBadge(user),
-                ],
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'Profile',
+              style: GoogleFonts.dmSans(
+                fontWeight: FontWeight.bold,
+                color: AppColors.charcoalBlack,
               ),
             ),
-
-            const SizedBox(height: 32),
-
-            // Complete Profile Section
-            if (!user.isFullyVerified) ...[
-              _buildSectionTitle('Complete Your Profile'),
-              const SizedBox(height: 12),
-              _buildProfileCompletionCard(user),
-              const SizedBox(height: 24),
+            backgroundColor: Colors.white,
+            elevation: 0,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout, color: AppColors.coralRed),
+                onPressed: () async {
+                  await authProvider.signOut();
+                  await _userProfileBox.clear();
+                  if (context.mounted) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                          (route) => false,
+                    );
+                  }
+                },
+              ),
             ],
-
-            // Profile Information
-            _buildSectionTitle('Profile Information'),
-            const SizedBox(height: 12),
-            _buildInfoCard(user),
-
-            const SizedBox(height: 24),
-
-            // Location Information
-            _buildSectionTitle('Location'),
-            const SizedBox(height: 12),
-            _buildLocationCard(user),
-
-            const SizedBox(height: 24),
-
-            // Personal Information (if completed)
-            if (user.personalInfo != null) ...[
-              _buildSectionTitle('Personal Details'),
-              const SizedBox(height: 12),
-              _buildPersonalInfoCard(user),
-              const SizedBox(height: 24),
-            ],
-
-            // Household Members (if added)
-            if (user.familyMembers.isNotEmpty) ...[
-              _buildSectionTitle('Household Members'),
-              const SizedBox(height: 12),
-              ...user.familyMembers.map((member) => _buildFamilyMemberCard(member)),
-            ],
-          ],
-        ),
-      ),
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Column(
+                    children: [
+                      Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          GestureDetector(
+                            onTap: _updateProfilePicture,
+                            child: CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.grey.shade200,
+                              backgroundImage: _profileImage != null
+                                  ? MemoryImage(_profileImage!)
+                                  : (user.profilePictureUrl != null && user.profilePictureUrl!.isNotEmpty)
+                                  ? NetworkImage(user.profilePictureUrl!)
+                                  : null as ImageProvider?,
+                              child: (_profileImage == null && (user.profilePictureUrl == null || user.profilePictureUrl!.isEmpty))
+                                  ? Text(
+                                user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : '?',
+                                style: GoogleFonts.dmSans(fontSize: 40, fontWeight: FontWeight.bold),
+                              )
+                                  : null,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: _updateProfilePicture,
+                            child: Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: AppColors.brightBlue,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2),
+                              ),
+                              child: const Icon(Icons.edit, color: Colors.white, size: 16),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(user.fullName, style: GoogleFonts.dmSans(fontSize: 24, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Text(user.email, style: GoogleFonts.dmSans(fontSize: 14, color: Colors.grey.shade600)),
+                      const SizedBox(height: 8),
+                      _buildVerificationBadge(user),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+                if (!user.isFullyVerified) ...[
+                  _buildSectionTitle('Complete Your Profile'),
+                  const SizedBox(height: 12),
+                  _buildProfileCompletionCard(user),
+                  const SizedBox(height: 24),
+                ],
+                _buildSectionTitle('Profile Information'),
+                const SizedBox(height: 12),
+                _buildInfoCard(user),
+                const SizedBox(height: 24),
+                _buildSectionTitle('Location'),
+                const SizedBox(height: 12),
+                _buildLocationCard(user),
+                const SizedBox(height: 24),
+                if (user.personalInfo != null) ...[
+                  _buildSectionTitle('Personal Details'),
+                  const SizedBox(height: 12),
+                  _buildPersonalInfoCard(user),
+                  const SizedBox(height: 24),
+                ],
+                if (user.familyMembers.isNotEmpty) ...[
+                  _buildSectionTitle('Household Members'),
+                  const SizedBox(height: 12),
+                  ...user.familyMembers.map((member) => _buildFamilyMemberCard(member)),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  // DELETE the entire _buildPhoneVerificationCard method
-// DELETE any phone verification button handlers
-// DELETE references to phoneVerified in the build method
-
-// Update the verification badge to only check profileCompleted:
-  Widget _buildVerificationBadge(user) {
+  Widget _buildVerificationBadge(UserModel user) {
     Color badgeColor;
     String badgeText;
     IconData badgeIcon;
@@ -193,7 +213,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.1),
+        color: badgeColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: badgeColor),
       ),
@@ -226,7 +246,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildProfileCompletionCard(user) {
+  Widget _buildProfileCompletionCard(UserModel user) {
     final canComplete = user.verificationStatus == 'partially_verified';
 
     return Container(
@@ -248,8 +268,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: canComplete
-                      ? AppColors.goldenYellow.withValues(alpha: 0.2)
-                      : AppColors.brightBlue.withValues(alpha: 0.2),
+                      ? AppColors.goldenYellow.withOpacity(0.2)
+                      : AppColors.brightBlue.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -280,7 +300,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 : 'Your account is being reviewed by the barangay admin. You\'ll be able to complete your profile once approved.',
             style: GoogleFonts.dmSans(
               fontSize: 14,
-              color: AppColors.charcoalBlack.withValues(alpha: 0.8),
+              color: AppColors.charcoalBlack.withOpacity(0.8),
               height: 1.5,
             ),
           ),
@@ -318,7 +338,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildInfoCard(user) {
+  Widget _buildInfoCard(UserModel user) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -340,7 +360,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: user.emailVerified
-                      ? Colors.green.withValues(alpha: 0.1)
+                      ? Colors.green.withOpacity(0.1)
                       : AppColors.lightRed,
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -364,7 +384,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: user.emailVerified
-                      ? Colors.green.withValues(alpha: 0.1)
+                      ? Colors.green.withOpacity(0.1)
                       : AppColors.lightRed,
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -384,7 +404,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildLocationCard(user) {
+  Widget _buildLocationCard(UserModel user) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -404,7 +424,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildPersonalInfoCard(user) {
+  Widget _buildPersonalInfoCard(UserModel user) {
     final info = user.personalInfo!;
     return Container(
       padding: const EdgeInsets.all(20),
@@ -443,7 +463,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildFamilyMemberCard(member) {
+  Widget _buildFamilyMemberCard(FamilyMember member) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -451,7 +471,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         leading: CircleAvatar(
           backgroundColor: AppColors.lightBlue,
           child: Text(
-            member.firstName[0].toUpperCase(),
+            member.firstName.isNotEmpty ? member.firstName[0].toUpperCase() : '?',
             style: GoogleFonts.dmSans(
               fontWeight: FontWeight.bold,
               color: AppColors.brightBlue,

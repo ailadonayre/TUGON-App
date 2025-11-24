@@ -8,7 +8,28 @@ import '../models/family_member_model.dart';
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Create user in Firestore
+  Future<void> updateUserProfilePicture(String uid, String newUrl) async {
+    try {
+      final user = await findUserByEmail((await _firestore.collectionGroup('users').where('uid', isEqualTo: uid).get()).docs.first.data()['email']);
+
+      if (user == null) {
+        throw Exception('User not found, cannot update profile picture.');
+      }
+
+      final barangayDocId = user.location.toDocumentId();
+
+      await _firestore
+          .collection('barangays')
+          .doc(barangayDocId)
+          .collection('users')
+          .doc(uid)
+          .update({'profilePictureUrl': newUrl});
+    } catch (e) {
+      print('Error updating profile picture in Firestore: $e');
+      throw Exception('Failed to update profile picture URL: ${e.toString()}');
+    }
+  }
+
   Future<void> createUser(UserModel user) async {
     try {
       final barangayDocId = user.location.toDocumentId();
@@ -24,7 +45,6 @@ class FirestoreService {
     }
   }
 
-  // Find user by email across all barangays
   Future<UserModel?> findUserByEmail(String email) async {
     try {
       final barangays = await _firestore.collection('barangays').get();
@@ -48,7 +68,6 @@ class FirestoreService {
     }
   }
 
-  // Get user by UID and location
   Future<UserModel?> getUserByUid(String uid, LocationData location) async {
     try {
       final barangayDocId = location.toDocumentId();
@@ -70,7 +89,6 @@ class FirestoreService {
     }
   }
 
-  // NEW: Update verification status
   Future<void> updateVerificationStatus(
       String uid,
       LocationData location,
@@ -90,7 +108,6 @@ class FirestoreService {
     }
   }
 
-  // NEW: Update profile completion status
   Future<void> updateProfileCompletion(
       String uid,
       LocationData location,
@@ -106,7 +123,6 @@ class FirestoreService {
           .doc(uid)
           .update({'profileCompleted': completed});
 
-      // SIMPLIFIED: Just check profileCompleted
       if (completed) {
         await updateVerificationStatus(uid, location, 'fully_verified');
       }
@@ -143,9 +159,9 @@ class FirestoreService {
       if (user == null) return;
 
       String newStatus;
-      if (user.profileCompleted) {  // REMOVED: && user.phoneVerified
+      if (user.profileCompleted) {
         newStatus = 'fully_verified';
-      } else if (user.profileCompleted) {  // REMOVED: || user.phoneVerified
+      } else if (user.profileCompleted) {
         newStatus = 'partially_verified';
       } else {
         newStatus = 'pending_admin';
@@ -159,7 +175,6 @@ class FirestoreService {
     }
   }
 
-  // KEPT: Email verification (used only at registration)
   Future<void> updateEmailVerification(
       String uid,
       LocationData location,
@@ -179,7 +194,6 @@ class FirestoreService {
     }
   }
 
-  // Update user status (pending_review, approved, rejected, partial)
   Future<void> updateUserStatus(
       String uid,
       LocationData location,
@@ -188,7 +202,6 @@ class FirestoreService {
     try {
       final barangayDocId = location.toDocumentId();
 
-      // When admin approves, set to partially_verified
       String verificationStatus = 'pending_admin';
       if (status == 'approved') {
         verificationStatus = 'partially_verified';
@@ -208,7 +221,6 @@ class FirestoreService {
     }
   }
 
-  // Check if user is admin
   Future<bool> isUserAdmin(String uid) async {
     try {
       final barangays = await _firestore.collection('barangays').get();
@@ -231,7 +243,6 @@ class FirestoreService {
     }
   }
 
-  // Get all pending users for a barangay (Admin function)
   Future<List<UserModel>> getPendingUsers(LocationData location) async {
     try {
       final barangayDocId = location.toDocumentId();
@@ -251,7 +262,6 @@ class FirestoreService {
     }
   }
 
-  // Seed barangay documents (for initial setup)
   Future<void> seedBarangayDocuments() async {
     try {
       final barangays = [
@@ -294,7 +304,6 @@ class FirestoreService {
     }
   }
 
-  // Get all users from a barangay
   Future<List<UserModel>> getAllUsers(LocationData location) async {
     try {
       final barangayDocId = location.toDocumentId();
@@ -314,7 +323,6 @@ class FirestoreService {
     }
   }
 
-  // Get users by status
   Future<List<UserModel>> getUsersByStatus(
       LocationData location,
       String status,
@@ -338,7 +346,6 @@ class FirestoreService {
     }
   }
 
-  // Approve user - sets to partially_verified
   Future<void> approveUser(String uid, LocationData location) async {
     try {
       await updateUserStatus(uid, location, 'approved');
@@ -347,7 +354,6 @@ class FirestoreService {
     }
   }
 
-  // Reject user
   Future<void> rejectUser(String uid, LocationData location) async {
     try {
       await updateUserStatus(uid, location, 'rejected');
@@ -356,7 +362,6 @@ class FirestoreService {
     }
   }
 
-  // Get user statistics
   Future<Map<String, int>> getUserStatistics(LocationData location) async {
     try {
       final barangayDocId = location.toDocumentId();
@@ -398,7 +403,6 @@ class FirestoreService {
     }
   }
 
-  // Search users by name or email
   Future<List<UserModel>> getAllUsersAcrossBarangays() async {
     final barangays = await _firestore.collection('barangays').get();
     List<UserModel> allUsers = [];
@@ -444,7 +448,6 @@ class FirestoreService {
           .map((doc) => UserModel.fromMap(doc.data(), doc.id))
           .toList();
 
-      // Filter locally (Firestore doesn't support complex text search)
       final filtered = allUsers.where((user) {
         final nameLower = user.fullName.toLowerCase();
         final emailLower = user.email.toLowerCase();
@@ -545,7 +548,6 @@ class FirestoreService {
           .map((doc) => NotificationModel.fromMap(doc.data(), doc.id))
           .toList();
 
-      // If userId is provided, filter: show user-specific OR barangay-wide notifications
       if (userId != null) {
         print('🔔 Filtering for userId: $userId');
         notifications = notifications
@@ -579,13 +581,12 @@ class FirestoreService {
     }
   }
 
-  /// Create a notification for a specific user or barangay-wide
   Future<void> createNotification({
     required LocationData location,
     required String title,
     required String body,
     required String type,
-    String? userId, // If null, notification is barangay-wide
+    String? userId,
     String? postId,
     String? reportId,
   }) async {
@@ -621,7 +622,6 @@ class FirestoreService {
     }
   }
 
-  // NEW: Update personal information and verification
   Future<void> updatePersonalInfo(
       String uid,
       LocationData location,
@@ -639,7 +639,7 @@ class FirestoreService {
           .update({
         'personalInfo': personalInfo.toMap(),
         'familyMembers': householdMembers.map((m) => m.toMap()).toList(),
-        'fullName': personalInfo.fullName, // Update displayed name
+        'fullName': personalInfo.fullName,
       });
     } catch (e) {
       throw Exception('Failed to update personal info: ${e.toString()}');
