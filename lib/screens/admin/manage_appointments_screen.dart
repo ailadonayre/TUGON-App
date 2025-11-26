@@ -236,13 +236,45 @@ class _ManageAppointmentsScreenState extends State<ManageAppointmentsScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
-          return AlertDialog(
-            title: Text('Request Details', style: GoogleFonts.dmSans(fontWeight: FontWeight.bold)),
-            content: SingleChildScrollView(
+          return Dialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 600),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Title
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Request Details',
+                            style: GoogleFonts.dmSans(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.pop(context),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  // Content
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                   Text('Update Status:', style: GoogleFonts.dmSans(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
@@ -300,15 +332,24 @@ class _ManageAppointmentsScreenState extends State<ManageAppointmentsScreen> {
                         border: OutlineInputBorder(), hintText: 'Reason for rejection/reschedule...'),
                     maxLines: 2,
                   ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Cancel', style: GoogleFonts.dmSans(color: Colors.grey))),
-              ElevatedButton(
-                onPressed: () async {
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Actions
+                  const Divider(height: 1),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('Cancel', style: GoogleFonts.dmSans(color: Colors.grey)),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: () async {
                   if (selectedStatus == 'rescheduled' && newRescheduledDate == null) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text('Please select a new date for rescheduling.'),
@@ -339,13 +380,20 @@ class _ManageAppointmentsScreenState extends State<ManageAppointmentsScreen> {
                     );
                   }
 
-                  if (mounted) Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.brightBlue, foregroundColor: Colors.white),
-                child: Text('Update', style: GoogleFonts.dmSans(fontWeight: FontWeight.bold)),
+                            if (mounted) Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.brightBlue,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text('Update', style: GoogleFonts.dmSans(fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           );
         },
       ),

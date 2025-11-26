@@ -62,7 +62,8 @@ class AuthProvider with ChangeNotifier {
         return;
       }
 
-      await _firestoreService.updateUserProfilePicture(_currentUser!.uid, downloadUrl);
+      final barangayDocId = _currentUser!.location.toDocumentId();
+      await _firestoreService.updateUserProfilePicture(_currentUser!.uid, barangayDocId, downloadUrl);
 
       _currentUser = _currentUser!.copyWith(profilePictureUrl: downloadUrl);
 

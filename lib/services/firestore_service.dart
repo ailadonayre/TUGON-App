@@ -8,16 +8,8 @@ import '../models/family_member_model.dart';
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> updateUserProfilePicture(String uid, String newUrl) async {
+  Future<void> updateUserProfilePicture(String uid, String barangayDocId, String newUrl) async {
     try {
-      final user = await findUserByEmail((await _firestore.collectionGroup('users').where('uid', isEqualTo: uid).get()).docs.first.data()['email']);
-
-      if (user == null) {
-        throw Exception('User not found, cannot update profile picture.');
-      }
-
-      final barangayDocId = user.location.toDocumentId();
-
       await _firestore
           .collection('barangays')
           .doc(barangayDocId)

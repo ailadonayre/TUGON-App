@@ -1,0 +1,214 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/barangays/$(getBarangayId())/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/barangays/$(getBarangayId())/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    function getBarangayId() {
+      return request.path[3];
+    }
+
+    // Validate user data structure and fields
+    function isValidUserData() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['fullName', 'email', 'phone', 'location', 'status', 'emailVerified', 'isAdmin', 'createdAt']) &&
+             data.fullName is string && data.fullName.size() > 0 &&
+             data.email is string && data.email.matches('^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$') &&
+             data.phone is string && data.phone.matches('^(09|\\+639)\\d{9}$') &&
+             data.location is map &&
+             data.location.keys().hasAll(['province', 'city', 'barangay']) &&
+             data.status in ['pending_review', 'approved', 'rejected', 'partial'] &&
+             data.emailVerified is bool &&
+             data.isAdmin is bool &&
+             data.createdAt is timestamp;
+    }
+
+    // Allow collectionGroup queries on users (needed for profile updates and login)
+    match /{path=**}/users/{userId} {
+      allow read: if isAuthenticated();
+    }
+
+    // Barangays collection
+    match /barangays/{barangayId} {
+      allow read: if true;
+      allow write: if false;
+
+      // Users subcollection
+      match /users/{userId} {
+        // Read rules - Allow individual document reads
+        allow read: if (
+          // Users can read their own document
+          isOwner(userId) ||
+          // Authenticated users can read documents for login
+          isAuthenticated()
+        );
+
+        // List/query rules - Allow admin queries
+        allow list: if (
+          // Allow authenticated users to query (needed for login and admin functions)
+          isAuthenticated()
+        );
+
+        // Create rules
+        allow create: if (
+          isValidUserData() &&
+          request.resource.data.status == 'pending_review' &&
+          request.resource.data.isAdmin == false
+        );
+
+        // Update rules
+        allow update: if isAuthenticated();
+
+        // Delete rules
+        allow delete: if isAuthenticated();
+      }
+
+      // Posts subcollection (barangay announcements and community posts)
+      match /posts/{postId} {
+        // Anyone can read posts
+        allow read: if true;
+
+        // Only admins can create, update, or delete posts
+        allow create: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+
+        allow update: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+
+        allow delete: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+
+        // Reactions subcollection
+        match /reactions/{reactionId} {
+          // Anyone can read reactions
+          allow read: if true;
+
+          // Authenticated users can create reactions
+          allow create: if isAuthenticated();
+
+          // Users can update their own reactions
+          allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+
+          // Users can delete their own reactions
+          allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+        }
+      }
+
+      // Hotlines subcollection
+      match /hotlines/{hotlineId} {
+        // Anyone can read active hotlines
+        allow read: if true;
+
+        // Only admins can create, update, or delete hotlines
+        allow create: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+
+        allow update: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+
+        allow delete: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+      }
+
+      // Reports subcollection
+      match /reports/{reportId} {
+        // Users can read their own reports, admins can read all reports
+        allow read: if isAuthenticated() && (
+          resource.data.userId == request.auth.uid ||
+          (exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true)
+        );
+
+        // List/query - admins can list all, users can query their own
+        allow list: if isAuthenticated();
+
+        // Authenticated users can create reports
+        allow create: if isAuthenticated() &&
+                        request.resource.data.userId == request.auth.uid;
+
+        // Only admins can update reports (for status changes and responses)
+        allow update: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+
+        // Only admins can delete reports
+        allow delete: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+      }
+
+      // Notifications subcollection
+      match /notifications/{notificationId} {
+        // Users can read all notifications (filtering is done client-side)
+        allow read: if isAuthenticated();
+
+        // Allow querying notifications
+        allow list: if isAuthenticated();
+
+        // Only admins can create notifications
+        allow create: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+
+        // Users can update notifications (mark as read)
+        allow update: if isAuthenticated();
+
+        // Only admins can delete notifications
+        allow delete: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+      }
+
+      // Appointments subcollection (document requests)
+      match /appointments/{appointmentId} {
+        // Users can read their own appointments, admins can read all appointments
+        allow read: if isAuthenticated() && (
+          resource.data.userId == request.auth.uid ||
+          (exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true)
+        );
+
+        // List/query - admins can list all, users can query their own
+        allow list: if isAuthenticated();
+
+        // Authenticated users can create appointments
+        allow create: if isAuthenticated() &&
+                        request.resource.data.userId == request.auth.uid;
+
+        // Only admins can update appointments (for status changes and scheduling)
+        allow update: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+
+        // Only admins can delete appointments
+        allow delete: if isAuthenticated() &&
+                        exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
+                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+      }
+    }
+
+    // Verification codes collection
+    match /verification_codes/{email} {
+      allow read, write: if true;
+    }
+  }
+}

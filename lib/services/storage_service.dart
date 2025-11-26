@@ -1,13 +1,29 @@
 import 'dart:io';
+import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 
 class StorageService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final ImagePicker _picker = ImagePicker();
-  final Box _userProfileBox = Hive.box('user_profile');
+
+  CloudinaryPublic? _cloudinary;
+
+  CloudinaryPublic get cloudinary {
+    if (_cloudinary == null) {
+      final cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'];
+      final uploadPreset = dotenv.env['CLOUDINARY_UPLOAD_PRESET'];
+
+      if (cloudName == null || uploadPreset == null) {
+        throw Exception('Cloudinary credentials not found in .env file');
+      }
+
+      _cloudinary = CloudinaryPublic(cloudName, uploadPreset, cache: false);
+    }
+    return _cloudinary!;
+  }
 
   Future<String?> uploadProfilePicture(String userId) async {
     try {
@@ -30,19 +46,29 @@ class StorageService {
             'Image is too large. Please select an image smaller than 2 MB.');
       }
 
-      final imageBytes = await pickedFile.readAsBytes();
+      print('Uploading to Cloudinary: ${pickedFile.path}');
 
-      await _userProfileBox.put('profile_image', imageBytes);
+      // Upload to Cloudinary
+      final response = await cloudinary.uploadFile(
+        CloudinaryFile.fromFile(
+          pickedFile.path,
+          resourceType: CloudinaryResourceType.Image,
+          folder: 'profile_pictures',
+          publicId: userId,
+        ),
+      );
 
-      final ref = _storage.ref().child('profile_pictures').child('$userId.jpg');
-      final uploadTask = await ref.putFile(File(pickedFile.path));
-      final downloadUrl = await uploadTask.ref.getDownloadURL();
+      print('Cloudinary upload successful: ${response.secureUrl}');
+      print('Public ID: ${response.publicId}');
 
-      return downloadUrl;
+      return response.secureUrl;
 
-    } on FirebaseException catch (e) {
+    } on CloudinaryException catch (e) {
+      print('Cloudinary error: ${e.message}');
+      print('Error details: ${e.toString()}');
       throw Exception('Error uploading profile picture: ${e.message}');
     } catch (e) {
+      print('Upload error: ${e.toString()}');
       throw Exception(e.toString());
     }
   }
@@ -62,20 +88,31 @@ class StorageService {
             'Report image is too large. Please select an image smaller than 5 MB.');
       }
 
-      final String fileName =
-          '${DateTime.now().millisecondsSinceEpoch}-${p.basename(path)}';
+      print('Uploading report image to Cloudinary: $path');
 
-      final ref = _storage.ref().child('report_images').child(fileName);
+      final String fileName = '${DateTime.now().millisecondsSinceEpoch}_${p.basename(path)}';
 
-      final uploadTask = await ref.putFile(file);
+      // Upload to Cloudinary
+      final response = await cloudinary.uploadFile(
+        CloudinaryFile.fromFile(
+          path,
+          resourceType: CloudinaryResourceType.Image,
+          folder: 'report_images',
+          publicId: fileName,
+        ),
+      );
 
-      final String downloadUrl = await uploadTask.ref.getDownloadURL();
+      print('Cloudinary report upload successful: ${response.secureUrl}');
+      print('Public ID: ${response.publicId}');
 
-      return downloadUrl;
+      return response.secureUrl;
 
-    } on FirebaseException catch (e) {
+    } on CloudinaryException catch (e) {
+      print('Cloudinary error: ${e.message}');
+      print('Error details: ${e.toString()}');
       throw Exception('Error uploading report image: ${e.message}');
     } catch (e) {
+      print('Upload error: ${e.toString()}');
       throw Exception(e.toString());
     }
   }

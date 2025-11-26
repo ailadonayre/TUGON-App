@@ -306,24 +306,31 @@ class _ManageReportsScreenState extends State<ManageReportsScreen> {
                     ),
                   ),
                   const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getCategoryColor(report.category).withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      report.category.toUpperCase(),
-                      style: GoogleFonts.dmSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: _getCategoryColor(report.category),
+                  if (report.location != null)
+                    Flexible(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.location_on,
+                            size: 14,
+                            color: Colors.grey.shade600,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              report.location!,
+                              style: GoogleFonts.dmSans(
+                                fontSize: 11,
+                                color: Colors.grey.shade600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
                 ],
               ),
             ],
@@ -412,16 +419,45 @@ class _ManageReportsScreenState extends State<ManageReportsScreen> {
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: Text(
-            'Report Details',
-            style: GoogleFonts.dmSans(fontWeight: FontWeight.bold),
-          ),
-          content: SingleChildScrollView(
+        builder: (context, setState) => Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 600),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Title
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Report Details',
+                          style: GoogleFonts.dmSans(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                // Content
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                 Text(
                   report.title,
                   style: GoogleFonts.dmSans(
@@ -536,20 +572,28 @@ class _ManageReportsScreenState extends State<ManageReportsScreen> {
                     ),
                   ),
                   maxLines: 3,
+                      ),
+                      ],
+                    ),
+                  ),
                 ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.dmSans(color: Colors.grey),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
+                // Actions
+                const Divider(height: 1),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFonts.dmSans(color: Colors.grey),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        onPressed: () async {
                 try {
                   final updates = {
                     'status': selectedStatus,
@@ -610,16 +654,21 @@ class _ManageReportsScreenState extends State<ManageReportsScreen> {
                   }
                 }
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.brightBlue,
-                foregroundColor: AppColors.white,
-              ),
-              child: Text(
-                'Update',
-                style: GoogleFonts.dmSans(fontWeight: FontWeight.bold),
-              ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.brightBlue,
+                          foregroundColor: AppColors.white,
+                        ),
+                        child: Text(
+                          'Update',
+                          style: GoogleFonts.dmSans(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

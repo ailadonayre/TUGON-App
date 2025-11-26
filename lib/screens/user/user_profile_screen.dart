@@ -1,7 +1,5 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/family_member_model.dart';
@@ -19,25 +17,6 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  Uint8List? _profileImage;
-  late final Box _userProfileBox;
-
-  @override
-  void initState() {
-    super.initState();
-    _userProfileBox = Hive.box('user_profile');
-    _loadProfileImage();
-  }
-
-  Future<void> _loadProfileImage() async {
-    final imageData = _userProfileBox.get('profile_image');
-    if (imageData != null && imageData is Uint8List && mounted) {
-      setState(() {
-        _profileImage = imageData;
-      });
-    }
-  }
-
   Future<void> _updateProfilePicture() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
@@ -47,8 +26,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     try {
       await authProvider.updateUserProfilePicture();
-
-      await _loadProfileImage();
 
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -94,7 +71,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 icon: const Icon(Icons.logout, color: AppColors.coralRed),
                 onPressed: () async {
                   await authProvider.signOut();
-                  await _userProfileBox.clear();
                   if (context.mounted) {
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -121,12 +97,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             child: CircleAvatar(
                               radius: 50,
                               backgroundColor: Colors.grey.shade200,
-                              backgroundImage: _profileImage != null
-                                  ? MemoryImage(_profileImage!)
-                                  : (user.profilePictureUrl != null && user.profilePictureUrl!.isNotEmpty)
+                              backgroundImage: (user.profilePictureUrl != null && user.profilePictureUrl!.isNotEmpty)
                                   ? NetworkImage(user.profilePictureUrl!)
                                   : null as ImageProvider?,
-                              child: (_profileImage == null && (user.profilePictureUrl == null || user.profilePictureUrl!.isEmpty))
+                              child: (user.profilePictureUrl == null || user.profilePictureUrl!.isEmpty)
                                   ? Text(
                                 user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : '?',
                                 style: GoogleFonts.dmSans(fontSize: 40, fontWeight: FontWeight.bold),
