@@ -81,6 +81,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       content: _contentController.text.trim(),
       authorId: authProvider.currentUser!.uid,
       authorName: authProvider.currentUser!.fullName,
+      authorProfilePicture: authProvider.currentUser!.profilePictureUrl,
       type: 'community',
       imageUrl: _imageUrl,
     );

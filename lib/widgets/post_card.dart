@@ -70,11 +70,16 @@ class PostCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: borderColor.withValues(alpha: 0.2),
-                  child: Icon(
-                    isBarangay ? Icons.campaign : Icons.person,
-                    color: borderColor,
-                    size: 20,
-                  ),
+                  backgroundImage: !isBarangay && post.authorProfilePicture != null && post.authorProfilePicture!.isNotEmpty
+                      ? NetworkImage(post.authorProfilePicture!)
+                      : null,
+                  child: (isBarangay || post.authorProfilePicture == null || post.authorProfilePicture!.isEmpty)
+                      ? Icon(
+                          isBarangay ? Icons.campaign : Icons.person,
+                          color: borderColor,
+                          size: 20,
+                        )
+                      : null,
                 ),
                 const SizedBox(width: 12),
                 Expanded(

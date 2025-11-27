@@ -7,6 +7,7 @@ class PostModel {
   final String content;
   final String authorId;
   final String authorName;
+  final String? authorProfilePicture;
   final String? imageUrl;
   final bool pinned;
   final bool isCritical;
@@ -20,6 +21,7 @@ class PostModel {
     required this.content,
     required this.authorId,
     required this.authorName,
+    this.authorProfilePicture,
     this.imageUrl,
     this.pinned = false,
     this.isCritical = false,
@@ -35,6 +37,7 @@ class PostModel {
       content: map['content'] ?? '',
       authorId: map['authorId'] ?? '',
       authorName: map['authorName'] ?? '',
+      authorProfilePicture: map['authorProfilePicture'],
       imageUrl: map['imageUrl'],
       pinned: map['pinned'] ?? false,
       isCritical: map['isCritical'] ?? false,
@@ -50,6 +53,7 @@ class PostModel {
       'content': content,
       'authorId': authorId,
       'authorName': authorName,
+      'authorProfilePicture': authorProfilePicture,
       'imageUrl': imageUrl,
       'pinned': pinned,
       'isCritical': isCritical,
