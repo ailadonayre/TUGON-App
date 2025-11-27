@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
+import '../../utils/responsive.dart';
 import '../../providers/auth_provider.dart';
 import 'user_home_screen.dart';
 import 'user_search_screen.dart';
@@ -120,34 +121,42 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   }
 
   Widget _buildCenterPostButton() {
+    final responsive = Responsive(context);
+    final buttonSize = responsive.iconSize(60);
+    final iconSize = responsive.iconSize(32);
+
     return GestureDetector(
       onTap: _onCreatePost,
       child: Container(
-        width: 60,
-        height: 60,
+        width: buttonSize,
+        height: buttonSize,
         decoration: BoxDecoration(
           color: AppColors.goldenYellow, // solid color
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.coralRed.withOpacity(0.4),
+              color: AppColors.goldenYellow.withOpacity(0.4),
               blurRadius: 15,
               offset: const Offset(0, 5),
             ),
           ],
         ),
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 32),
+        child: Icon(Icons.add_rounded, color: Colors.white, size: iconSize),
       ),
     );
   }
 
   Widget _buildBottomNavBar() {
+    final responsive = Responsive(context);
+    final borderRadius = responsive.radius(24);
+    final navHeight = responsive.spacing(65);
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(borderRadius),
+          topRight: Radius.circular(borderRadius),
         ),
         boxShadow: [
           BoxShadow(
@@ -158,9 +167,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         ],
       ),
       child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(borderRadius),
+          topRight: Radius.circular(borderRadius),
         ),
         child: BottomAppBar(
           elevation: 0,
@@ -168,7 +177,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           padding: EdgeInsets.zero,
           child: SafeArea(
             child: SizedBox(
-              height: 65,
+              height: navHeight,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -188,6 +197,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   }
 
   Widget _buildNavItem(int index, IconData icon, String label, Color activeColor) {
+    final responsive = Responsive(context);
     final isSelected = _currentIndex == index;
 
     return Flexible(
@@ -196,12 +206,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: EdgeInsets.symmetric(
-            horizontal: isSelected ? 12 : 8,
-            vertical: 6,
+            horizontal: isSelected ? responsive.spacing(12) : responsive.spacing(8),
+            vertical: responsive.spacing(6),
           ),
           decoration: BoxDecoration(
             color: isSelected ? activeColor.withOpacity(0.1) : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(responsive.radius(12)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -210,13 +220,13 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               Icon(
                 icon,
                 color: isSelected ? activeColor : Colors.grey.shade400,
-                size: isSelected ? 26 : 24,
+                size: responsive.iconSize(isSelected ? 26 : 24),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: responsive.spacing(2)),
               Text(
                 label,
                 style: GoogleFonts.dmSans(
-                  fontSize: 10,
+                  fontSize: responsive.sp(10),
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   color: isSelected ? activeColor : Colors.grey.shade400,
                 ),

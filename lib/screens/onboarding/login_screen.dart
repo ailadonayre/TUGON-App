@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tugon_app/screens/user/user_dashboard_screen.dart';
 import '../../utils/colors.dart';
+import '../../utils/responsive.dart';
 import '../../widgets/custom_textfield.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/location_selection_screen.dart';
@@ -66,12 +67,19 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
       if (mounted) {
         if (success) {
+          await authProvider.loadUserData(_emailController.text.trim());
+
           final user = authProvider.currentUser;
 
           if (user?.isAdmin == true) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
+            await authProvider.signOut();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('⚠️ Admin accounts cannot login here. Please use the Admin Portal.'),
+                backgroundColor: AppColors.coralRed,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 4),
+              ),
             );
           } else {
             if (user?.status == 'approved') {
@@ -111,12 +119,22 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
     if (mounted) {
       if (success) {
+        final email = authProvider.firebaseUser?.email;
+        if (email != null) {
+          await authProvider.loadUserData(email);
+        }
+
         final user = authProvider.currentUser;
 
         if (user?.isAdmin == true) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
+          await authProvider.signOut();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('⚠️ Admin accounts cannot login here. Please use the Admin Portal.'),
+              backgroundColor: AppColors.coralRed,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+            ),
           );
         } else {
           if (user?.status == 'approved') {

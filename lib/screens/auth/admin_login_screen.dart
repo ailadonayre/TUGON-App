@@ -37,6 +37,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       );
 
       if (mounted && success) {
+        await authProvider.loadUserData(_emailController.text.trim());
+
         final user = authProvider.currentUser;
 
         if (user?.isAdmin == true) {
@@ -45,26 +47,21 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
           );
         } else {
-          if (user?.status == 'approved') {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '✅ Login successful!',
-                  style: GoogleFonts.dmSans(),
-                ),
-                backgroundColor: Colors.green,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+          await authProvider.signOut();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '⚠️ Access Denied: This portal is for administrators only. Please use the regular login.',
+                style: GoogleFonts.dmSans(),
               ),
-            );
-          } else if (user?.status == 'pending_review') {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const PendingApprovalScreen()),
-            );
-          }
+              backgroundColor: AppColors.coralRed,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
         }
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -116,4 +116,54 @@ class StorageService {
       throw Exception(e.toString());
     }
   }
+
+  Future<String?> pickAndUploadPostImage() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 70,
+        maxWidth: 1920,
+      );
+
+      if (pickedFile == null) {
+        print('No image selected.');
+        return null;
+      }
+
+      const int maxFileSize = 5 * 1024 * 1024;
+      final int fileSize = await pickedFile.length();
+
+      if (fileSize > maxFileSize) {
+        throw Exception(
+            'Image is too large. Please select an image smaller than 5 MB.');
+      }
+
+      print('Uploading post image to Cloudinary: ${pickedFile.path}');
+
+      final String fileName = '${DateTime.now().millisecondsSinceEpoch}_${p.basename(pickedFile.path)}';
+
+      // Upload to Cloudinary
+      final response = await cloudinary.uploadFile(
+        CloudinaryFile.fromFile(
+          pickedFile.path,
+          resourceType: CloudinaryResourceType.Image,
+          folder: 'post_images',
+          publicId: fileName,
+        ),
+      );
+
+      print('Cloudinary post image upload successful: ${response.secureUrl}');
+      print('Public ID: ${response.publicId}');
+
+      return response.secureUrl;
+
+    } on CloudinaryException catch (e) {
+      print('Cloudinary error: ${e.message}');
+      print('Error details: ${e.toString()}');
+      throw Exception('Error uploading post image: ${e.message}');
+    } catch (e) {
+      print('Upload error: ${e.toString()}');
+      throw Exception(e.toString());
+    }
+  }
 }
