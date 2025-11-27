@@ -137,14 +137,19 @@ class UserDetailScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 50,
                     backgroundColor: AppColors.white,
-                    child: Text(
-                      user.fullName[0].toUpperCase(),
-                      style: GoogleFonts.dmSans(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.brightBlue,
-                      ),
-                    ),
+                    backgroundImage: user.profilePictureUrl != null && user.profilePictureUrl!.isNotEmpty
+                        ? NetworkImage(user.profilePictureUrl!)
+                        : null,
+                    child: user.profilePictureUrl == null || user.profilePictureUrl!.isEmpty
+                        ? Text(
+                            user.fullName[0].toUpperCase(),
+                            style: GoogleFonts.dmSans(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.brightBlue,
+                            ),
+                          )
+                        : null,
                   ),
                   const SizedBox(height: 16),
                   Text(

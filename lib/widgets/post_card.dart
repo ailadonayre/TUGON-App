@@ -6,6 +6,8 @@ import '../../models/post_model.dart';
 import '../../models/reaction_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/reaction_service.dart';
+import '../../services/comment_service.dart';
+import '../../screens/user/comments_screen.dart';
 
 class PostCard extends StatelessWidget {
   final PostModel post;
@@ -22,6 +24,7 @@ class PostCard extends StatelessWidget {
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.currentUser;
     final reactionService = ReactionService();
+    final commentService = CommentService();
 
     final isBarangay = post.type == 'barangay';
     final borderColor = post.isCritical
@@ -199,28 +202,88 @@ class PostCard extends StatelessWidget {
                 ),
                 if (post.imageUrl != null) ...[
                   const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      post.imageUrl!,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          height: 200,
-                          color: Colors.grey.shade200,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                                  : null,
-                              color: AppColors.brightBlue,
-                            ),
+                  GestureDetector(
+                    onTap: () {
+                      // Show full screen image
+                      showDialog(
+                        context: context,
+                        builder: (context) => Dialog(
+                          backgroundColor: Colors.black,
+                          insetPadding: EdgeInsets.zero,
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: InteractiveViewer(
+                                  child: Image.network(
+                                    post.imageUrl!,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 40,
+                                right: 16,
+                                child: IconButton(
+                                  icon: Icon(Icons.close, color: Colors.white, size: 30),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ),
+                            ],
                           ),
-                        );
-                      },
+                        ),
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxHeight: 400,
+                        ),
+                        child: Image.network(
+                          post.imageUrl!,
+                          width: double.infinity,
+                          fit: BoxFit.contain,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              height: 200,
+                              color: Colors.grey.shade200,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                      : null,
+                                  color: AppColors.brightBlue,
+                                ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.broken_image, size: 48, color: Colors.grey.shade400),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Failed to load image',
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -289,26 +352,53 @@ class PostCard extends StatelessWidget {
                         ],
                       ),
                       const Spacer(), // This pushes the comment icon to the right
-                      // --- END OF FIX ---
 
-                      // Comment indicator (placeholder)
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.comment_outlined,
-                            size: 18,
-                            color: Colors.grey.shade600,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            '0',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                        ],
-                      ),
+                      // Comment section with real-time count
+                      if (user != null)
+                        StreamBuilder<int>(
+                          stream: commentService.streamCommentCount(post.id, user.location),
+                          builder: (context, snapshot) {
+                            final commentCount = snapshot.data ?? 0;
+
+                            return InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => CommentsScreen(post: post),
+                                  ),
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 6,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.comment_outlined,
+                                      size: 18,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      commentCount.toString(),
+                                      style: GoogleFonts.dmSans(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                        fontWeight: commentCount > 0
+                                            ? FontWeight.w600
+                                            : FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                     ],
                   ),
                 );

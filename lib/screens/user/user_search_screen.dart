@@ -63,7 +63,9 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
   Future<void> _fetchAllData() async {
     setState(() => _loading = true);
     try {
-      final users = await _firestoreService.getAllUsersAcrossBarangays();
+      final allUsers = await _firestoreService.getAllUsersAcrossBarangays();
+      // Filter out admin users
+      final users = allUsers.where((user) => !user.isAdmin).toList();
       final posts = await _firestoreService.getAllPostsAcrossBarangays();
       setState(() {
         _allResults = [...users, ...posts];
@@ -262,10 +264,15 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: Colors.red,
-                        child: Text(
-                          item.fullName.isNotEmpty ? item.fullName[0].toUpperCase() : '?',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
+                        backgroundImage: item.profilePictureUrl != null && item.profilePictureUrl!.isNotEmpty
+                            ? NetworkImage(item.profilePictureUrl!)
+                            : null,
+                        child: item.profilePictureUrl == null || item.profilePictureUrl!.isEmpty
+                            ? Text(
+                                item.fullName.isNotEmpty ? item.fullName[0].toUpperCase() : '?',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              )
+                            : null,
                       ),
                       title: Text(item.fullName),
                       subtitle: Text(item.email),

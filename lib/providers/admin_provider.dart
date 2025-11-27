@@ -32,12 +32,15 @@ class AdminProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Load all users
+  // Load all users (excluding admins)
   Future<void> loadAllUsers(LocationData location) async {
     try {
       setLoading(true);
       clearError();
-      _users = await _firestoreService.getAllUsers(location);
+      final allUsers = await _firestoreService.getAllUsers(location);
+      // Filter out admin accounts
+      _users = allUsers.where((user) => !user.isAdmin).toList();
+      notifyListeners();
     } catch (e) {
       setError(e.toString());
     } finally {
@@ -102,7 +105,7 @@ class AdminProvider with ChangeNotifier {
     }
   }
 
-  // Search users
+  // Search users (excluding admins)
   Future<void> searchUsers(LocationData location, String query) async {
     try {
       setLoading(true);
@@ -110,7 +113,9 @@ class AdminProvider with ChangeNotifier {
       if (query.isEmpty) {
         await loadAllUsers(location);
       } else {
-        _users = await _firestoreService.searchUsers(location, query);
+        final searchResults = await _firestoreService.searchUsers(location, query);
+        // Filter out admin accounts from search results
+        _users = searchResults.where((user) => !user.isAdmin).toList();
         notifyListeners();
       }
     } catch (e) {
@@ -120,14 +125,21 @@ class AdminProvider with ChangeNotifier {
     }
   }
 
-  // Filter by status
+  // Filter by status (excluding admins)
   Future<void> filterByStatus(LocationData location, String status) async {
     try {
       setLoading(true);
       clearError();
-      _users = await _firestoreService.getUsersByStatus(location, status);
+      print('🔍 Filtering users by status: $status');
+      final filteredUsers = await _firestoreService.getUsersByStatus(location, status);
+      print('📊 Found ${filteredUsers.length} users with status: $status');
+      // Filter out admin accounts from filtered results
+      _users = filteredUsers.where((user) => !user.isAdmin).toList();
+      print('✅ After filtering admins: ${_users.length} users');
+      print('📋 Users: ${_users.map((u) => '${u.fullName} (${u.status})').join(', ')}');
       notifyListeners();
     } catch (e) {
+      print('❌ Error filtering users: $e');
       setError(e.toString());
     } finally {
       setLoading(false);

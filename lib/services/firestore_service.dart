@@ -327,12 +327,16 @@ class FirestoreService {
           .doc(barangayDocId)
           .collection('users')
           .where('status', isEqualTo: status)
-          .orderBy('createdAt', descending: true)
           .get();
 
-      return snapshot.docs
+      // Sort by createdAt locally instead of using Firestore orderBy to avoid index requirement
+      final users = snapshot.docs
           .map((doc) => UserModel.fromMap(doc.data(), doc.id))
           .toList();
+
+      users.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      return users;
     } catch (e) {
       throw Exception('Failed to get users by status: ${e.toString()}');
     }

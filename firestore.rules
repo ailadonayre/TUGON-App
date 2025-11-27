@@ -81,18 +81,34 @@ service cloud.firestore {
         // Anyone can read posts
         allow read: if true;
 
-        // Only admins can create, update, or delete posts
+        // Authenticated users can create posts
+        // Admins can create any type of post (barangay or community)
+        // Regular users can only create community posts
         allow create: if isAuthenticated() &&
                         exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
-                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+                        (
+                          // Admins can create any post
+                          get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true ||
+                          // Regular users can only create community posts
+                          (request.resource.data.type == 'community' &&
+                           request.resource.data.authorId == request.auth.uid)
+                        );
 
+        // Only admins can update posts, or users can update their own community posts
         allow update: if isAuthenticated() &&
                         exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
-                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+                        (
+                          get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true ||
+                          (resource.data.type == 'community' && resource.data.authorId == request.auth.uid)
+                        );
 
+        // Only admins can delete posts, or users can delete their own community posts
         allow delete: if isAuthenticated() &&
                         exists(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)) &&
-                        get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true;
+                        (
+                          get(/databases/$(database)/documents/barangays/$(barangayId)/users/$(request.auth.uid)).data.isAdmin == true ||
+                          (resource.data.type == 'community' && resource.data.authorId == request.auth.uid)
+                        );
 
         // Reactions subcollection
         match /reactions/{reactionId} {
@@ -107,6 +123,29 @@ service cloud.firestore {
 
           // Users can delete their own reactions
           allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+        }
+
+        // Comments subcollection
+        match /comments/{commentId} {
+          // Anyone can read comments
+          allow read: if true;
+
+          // Authenticated users can create comments
+          allow create: if isAuthenticated() &&
+                          request.resource.data.userId == request.auth.uid &&
+                          request.resource.data.keys().hasAll(['postId', 'userId', 'userName', 'content', 'createdAt']) &&
+                          request.resource.data.content is string &&
+                          request.resource.data.content.size() > 0 &&
+                          request.resource.data.content.size() <= 1000;
+
+          // Users can update their own comments
+          allow update: if isAuthenticated() &&
+                          resource.data.userId == request.auth.uid &&
+                          request.resource.data.userId == resource.data.userId;
+
+          // Users can delete their own comments
+          allow delete: if isAuthenticated() &&
+                          resource.data.userId == request.auth.uid;
         }
       }
 

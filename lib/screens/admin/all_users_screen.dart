@@ -45,9 +45,11 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final adminProvider = Provider.of<AdminProvider>(context, listen: false);
 
+    // Clear search when changing filter
+    _searchController.clear();
+
     setState(() {
       _selectedFilter = filter;
-      _searchController.clear();
     });
 
     if (authProvider.currentUser != null) {
@@ -67,6 +69,10 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
     final adminProvider = Provider.of<AdminProvider>(context, listen: false);
 
     if (authProvider.currentUser != null) {
+      // Reset filter to 'all' when searching
+      setState(() {
+        _selectedFilter = 'all';
+      });
       adminProvider.searchUsers(authProvider.currentUser!.location, query);
     }
   }
@@ -78,12 +84,25 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'All Users',
-          style: GoogleFonts.dmSans(
-            fontWeight: FontWeight.bold,
-            color: AppColors.charcoalBlack,
-          ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'All Users',
+              style: GoogleFonts.dmSans(
+                fontWeight: FontWeight.bold,
+                color: AppColors.charcoalBlack,
+              ),
+            ),
+            if (!adminProvider.isLoading && users.isNotEmpty)
+              Text(
+                '${users.length} user${users.length != 1 ? 's' : ''}',
+                style: GoogleFonts.dmSans(
+                  fontSize: 12,
+                  color: AppColors.charcoalBlack.withValues(alpha: 0.6),
+                ),
+              ),
+          ],
         ),
         backgroundColor: AppColors.white,
         elevation: 0,
@@ -147,7 +166,66 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+
+          // Info banner
+          if (_searchController.text.isEmpty)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _selectedFilter == 'all'
+                    ? AppColors.lightBlue
+                    : _selectedFilter == 'pending_review'
+                        ? AppColors.goldenYellow.withValues(alpha: 0.1)
+                        : _selectedFilter == 'approved'
+                            ? AppColors.brightBlue.withValues(alpha: 0.1)
+                            : AppColors.coralRed.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: _selectedFilter == 'all'
+                      ? AppColors.brightBlue.withValues(alpha: 0.3)
+                      : _selectedFilter == 'pending_review'
+                          ? AppColors.goldenYellow.withValues(alpha: 0.3)
+                          : _selectedFilter == 'approved'
+                              ? AppColors.brightBlue.withValues(alpha: 0.3)
+                              : AppColors.coralRed.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 18,
+                    color: _selectedFilter == 'all'
+                        ? AppColors.brightBlue
+                        : _selectedFilter == 'pending_review'
+                            ? AppColors.goldenYellow
+                            : _selectedFilter == 'approved'
+                                ? AppColors.brightBlue
+                                : AppColors.coralRed,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _selectedFilter == 'all'
+                          ? 'Showing all users (Admin accounts hidden)'
+                          : _selectedFilter == 'pending_review'
+                              ? 'Showing users pending approval'
+                              : _selectedFilter == 'approved'
+                                  ? 'Showing approved users'
+                                  : 'Showing rejected users',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 12,
+                        color: AppColors.charcoalBlack.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          const SizedBox(height: 8),
 
           // User List
           Expanded(
@@ -163,17 +241,45 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.search_off,
+                    _selectedFilter == 'pending_review'
+                        ? Icons.check_circle_outline
+                        : _selectedFilter == 'approved'
+                            ? Icons.person_off_outlined
+                            : _selectedFilter == 'rejected'
+                                ? Icons.cancel_outlined
+                                : Icons.search_off,
                     size: 80,
                     color: AppColors.charcoalBlack.withValues(alpha: 0.2),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No users found',
+                    _selectedFilter == 'pending_review'
+                        ? 'No pending users'
+                        : _selectedFilter == 'approved'
+                            ? 'No approved users'
+                            : _selectedFilter == 'rejected'
+                                ? 'No rejected users'
+                                : 'No users found',
                     style: GoogleFonts.dmSans(
                       fontSize: 18,
-                      color: AppColors.charcoalBlack.withValues(alpha: 0.5),
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.charcoalBlack.withValues(alpha: 0.6),
                     ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _selectedFilter == 'pending_review'
+                        ? 'All users have been reviewed'
+                        : _selectedFilter == 'approved'
+                            ? 'No users with approved status'
+                            : _selectedFilter == 'rejected'
+                                ? 'No users with rejected status'
+                                : 'Try adjusting your search or filter',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 14,
+                      color: AppColors.charcoalBlack.withValues(alpha: 0.4),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -277,14 +383,19 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: statusColor.withValues(alpha: 0.15),
-                child: Text(
-                  user.fullName[0].toUpperCase(),
-                  style: GoogleFonts.dmSans(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: statusColor,
-                  ),
-                ),
+                backgroundImage: user.profilePictureUrl != null && user.profilePictureUrl!.isNotEmpty
+                    ? NetworkImage(user.profilePictureUrl!)
+                    : null,
+                child: user.profilePictureUrl == null || user.profilePictureUrl!.isEmpty
+                    ? Text(
+                        user.fullName[0].toUpperCase(),
+                        style: GoogleFonts.dmSans(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: statusColor,
+                        ),
+                      )
+                    : null,
               ),
               const SizedBox(width: 12),
               Expanded(
