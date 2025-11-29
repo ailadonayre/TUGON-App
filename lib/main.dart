@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:tugon_app/screens/user/user_dashboard_screen.dart';
 
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
@@ -11,7 +12,6 @@ import 'providers/admin_provider.dart';
 import 'providers/profile_provider.dart';
 import 'providers/post_provider.dart';
 import 'providers/notification_provider.dart';
-import 'screens/onboarding/splash_screen.dart';
 import 'screens/onboarding/login_screen.dart';
 import 'utils/colors.dart';
 
@@ -210,11 +210,15 @@ class MyApp extends StatelessWidget {
             color: AppColors.white,
           ),
         ),
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const SplashScreen(),
-          '/login': (context) => const LoginScreen(),
-        },
+        home: Consumer<AuthProvider>(
+          builder: (context, auth, _) {
+            if (auth.isAuthenticated) {
+              return const UserDashboardScreen();
+            } else {
+              return const LoginScreen();
+            }
+          },
+        ),
       ),
     );
   }

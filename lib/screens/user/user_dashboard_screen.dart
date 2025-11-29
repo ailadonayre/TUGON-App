@@ -20,13 +20,12 @@ class UserDashboardScreen extends StatefulWidget {
 class _UserDashboardScreenState extends State<UserDashboardScreen> {
   int _currentIndex = 0;
 
-  // Screens list - current user is fetched dynamically inside each screen if needed
-  List<Widget> _screens() => const [
-    UserHomeScreen(),
-    UserSearchScreen(),
-    UserNotificationScreen(),
-    UserProfileScreen(), // No 'user' parameter
-  ];
+  List<Widget> _screens() => [
+        UserHomeScreen(onProfileTap: () => setState(() => _currentIndex = 3)),
+        const UserSearchScreen(),
+        const UserNotificationScreen(),
+        const UserProfileScreen(),
+      ];
 
   void _onCreatePost() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -52,15 +51,15 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     if (user?.status == 'pending_review') {
       statusLabel = 'Pending Admin Approval';
       message =
-      'Your account is awaiting approval from the barangay admin. You will be able to post once your account is approved.';
+          'Your account is awaiting approval from the barangay admin. You will be able to post once your account is approved.';
     } else if (user?.status == 'rejected') {
       statusLabel = 'Account Rejected';
       message =
-      'Your account registration was rejected. Please contact your barangay office for more information.';
+          'Your account registration was rejected. Please contact your barangay office for more information.';
     } else {
       statusLabel = 'Verification Required';
       message =
-      'Complete your profile verification to unlock community posting features.';
+          'Complete your profile verification to unlock community posting features.';
     }
 
     showDialog(
@@ -94,7 +93,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              setState(() => _currentIndex = 3); // Go to profile tab
+              setState(() => _currentIndex = 3);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.goldenYellow,
@@ -131,7 +130,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         width: buttonSize,
         height: buttonSize,
         decoration: BoxDecoration(
-          color: AppColors.goldenYellow, // solid color
+          color: AppColors.goldenYellow,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -154,9 +153,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(borderRadius),
-          topRight: Radius.circular(borderRadius),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
         ),
         boxShadow: [
           BoxShadow(
@@ -167,9 +166,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(borderRadius),
-          topRight: Radius.circular(borderRadius),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
         ),
         child: BottomAppBar(
           elevation: 0,
@@ -184,7 +183,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 children: [
                   _buildNavItem(0, Icons.home_rounded, 'Home', AppColors.goldenYellow),
                   _buildNavItem(1, Icons.search_rounded, 'Search', AppColors.goldenYellow),
-                  const SizedBox(width: 70), // Space for center button
+                  const SizedBox(width: 70),
                   _buildNavItem(2, Icons.notifications_rounded, 'Notifs', AppColors.goldenYellow),
                   _buildNavItem(3, Icons.person_rounded, 'Profile', AppColors.goldenYellow),
                 ],

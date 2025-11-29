@@ -176,6 +176,16 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<UserModel?> getUserById(String userId) async {
+    try {
+      final userData = await _firestoreService.getUserById(userId);
+      return userData;
+    } catch (e) {
+      debugPrint("Failed to get user by ID: $e");
+      return null;
+    }
+  }
+
   // Send Password Reset Email
   Future<bool> sendPasswordResetEmail(String email) async {
     try {

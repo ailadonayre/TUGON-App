@@ -23,6 +23,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _passwordFocusNode = FocusNode();
   bool _obscurePassword = true;
 
   late AnimationController _animationController;
@@ -53,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _passwordFocusNode.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -83,14 +85,16 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             );
           } else {
             if (user?.status == 'approved') {
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (_) => const UserDashboardScreen()),
+                (route) => false,
               );
             } else if (user?.status == 'pending_review') {
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (_) => const PendingApprovalScreen()),
+                (route) => false,
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -138,14 +142,16 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           );
         } else {
           if (user?.status == 'approved') {
-            Navigator.pushReplacement(
+            Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (_) => const UserDashboardScreen()),
+              (route) => false,
             );
           } else if (user?.status == 'pending_review') {
-            Navigator.pushReplacement(
+            Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (_) => const PendingApprovalScreen()),
+              (route) => false,
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -201,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     height: 300,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: Colors.white.withOpacity(0.1),
                     ),
                   ),
                 ),
@@ -213,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     height: 200,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.15),
+                      color: Colors.white.withOpacity(0.15),
                     ),
                   ),
                 ),
@@ -225,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     height: 250,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: Colors.white.withOpacity(0.1),
                     ),
                   ),
                 ),
@@ -237,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     height: 300,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.08),
+                      color: Colors.white.withOpacity(0.08),
                     ),
                   ),
                 ),
@@ -314,6 +320,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                       hint: 'Enter your email',
                                       keyboardType: TextInputType.emailAddress,
                                       prefixIcon: const Icon(Icons.email_outlined, color: AppColors.goldenYellow),
+                                      onFieldSubmitted: (_) {
+                                        FocusScope.of(context)
+                                            .requestFocus(_passwordFocusNode);
+                                      },
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return 'Please enter your email';
@@ -330,10 +340,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                     // Password Field
                                     CustomTextField(
                                       controller: _passwordController,
+                                      focusNode: _passwordFocusNode,
                                       label: 'Password',
                                       hint: 'Enter your password',
                                       obscureText: _obscurePassword,
                                       prefixIcon: const Icon(Icons.lock_outline, color: AppColors.goldenYellow),
+                                      onFieldSubmitted: (_) => _signInWithEmail(),
                                       suffixIcon: IconButton(
                                         icon: Icon(
                                           _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -538,7 +550,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           border: Border.all(color: Colors.grey.shade200, width: 2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),

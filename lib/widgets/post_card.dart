@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../screens/user/other_user_profile_screen.dart';
 import '../../utils/colors.dart';
 import '../../models/post_model.dart';
 import '../../models/reaction_model.dart';
@@ -30,8 +31,8 @@ class PostCard extends StatelessWidget {
     final borderColor = post.isCritical
         ? AppColors.coralRed
         : isBarangay
-        ? AppColors.brightBlue
-        : AppColors.goldenYellow;
+            ? AppColors.brightBlue
+            : AppColors.goldenYellow;
 
     final canInteract = user?.isFullyVerified ?? false;
 
@@ -41,12 +42,12 @@ class PostCard extends StatelessWidget {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: borderColor.withValues(alpha: 0.3),
+          color: borderColor.withOpacity(0.3),
           width: post.isCritical ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -56,115 +57,131 @@ class PostCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: borderColor.withValues(alpha: 0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: borderColor.withValues(alpha: 0.2),
-                  backgroundImage: !isBarangay && post.authorProfilePicture != null && post.authorProfilePicture!.isNotEmpty
-                      ? NetworkImage(post.authorProfilePicture!)
-                      : null,
-                  child: (isBarangay || post.authorProfilePicture == null || post.authorProfilePicture!.isEmpty)
-                      ? Icon(
-                          isBarangay ? Icons.campaign : Icons.person,
-                          color: borderColor,
-                          size: 20,
-                        )
-                      : null,
+          GestureDetector(
+            onTap: () {
+              if (!isBarangay) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => OtherUserProfileScreen(userId: post.authorId),
+                  ),
+                );
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: borderColor.withOpacity(0.1),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              post.authorName,
-                              style: GoogleFonts.dmSans(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.charcoalBlack,
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: borderColor.withOpacity(0.2),
+                    backgroundImage: !isBarangay &&
+                            post.authorProfilePicture != null &&
+                            post.authorProfilePicture!.isNotEmpty
+                        ? NetworkImage(post.authorProfilePicture!)
+                        : null,
+                    child: (isBarangay ||
+                            post.authorProfilePicture == null ||
+                            post.authorProfilePicture!.isEmpty)
+                        ? Icon(
+                            isBarangay ? Icons.campaign : Icons.person,
+                            color: borderColor,
+                            size: 20,
+                          )
+                        : null,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                post.authorName,
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.charcoalBlack,
+                                ),
                               ),
                             ),
-                          ),
-                          if (isPinned || post.pinned)
+                            if (isPinned || post.pinned)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: borderColor.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.push_pin,
+                                      size: 12,
+                                      color: borderColor,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'PINNED',
+                                      style: GoogleFonts.dmSans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: borderColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
-                                vertical: 4,
+                                vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: borderColor.withValues(alpha: 0.2),
+                                color: borderColor.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.push_pin,
-                                    size: 12,
-                                    color: borderColor,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'PINNED',
-                                    style: GoogleFonts.dmSans(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: borderColor,
-                                    ),
-                                  ),
-                                ],
+                              child: Text(
+                                isBarangay ? 'BARANGAY' : 'COMMUNITY',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: borderColor,
+                                ),
                               ),
                             ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: borderColor.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              isBarangay ? 'BARANGAY' : 'COMMUNITY',
+                            const SizedBox(width: 8),
+                            Text(
+                              _formatTimestamp(post.createdAt),
                               style: GoogleFonts.dmSans(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: borderColor,
+                                fontSize: 12,
+                                color: Colors.grey.shade600,
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _formatTimestamp(post.createdAt),
-                            style: GoogleFonts.dmSans(
-                              fontSize: 12,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
@@ -201,7 +218,7 @@ class PostCard extends StatelessWidget {
                   post.content,
                   style: GoogleFonts.dmSans(
                     fontSize: 14,
-                    color: AppColors.charcoalBlack.withValues(alpha: 0.8),
+                    color: AppColors.charcoalBlack.withOpacity(0.8),
                     height: 1.5,
                   ),
                 ),
@@ -229,7 +246,7 @@ class PostCard extends StatelessWidget {
                                 top: 40,
                                 right: 16,
                                 child: IconButton(
-                                  icon: Icon(Icons.close, color: Colors.white, size: 30),
+                                  icon: const Icon(Icons.close, color: Colors.white, size: 30),
                                   onPressed: () => Navigator.pop(context),
                                 ),
                               ),
@@ -241,7 +258,7 @@ class PostCard extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
-                        constraints: BoxConstraints(
+                        constraints: const BoxConstraints(
                           maxHeight: 400,
                         ),
                         child: Image.network(
@@ -257,7 +274,7 @@ class PostCard extends StatelessWidget {
                                 child: CircularProgressIndicator(
                                   value: loadingProgress.expectedTotalBytes != null
                                       ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
+                                          loadingProgress.expectedTotalBytes!
                                       : null,
                                   color: AppColors.brightBlue,
                                 ),
@@ -332,10 +349,10 @@ class PostCard extends StatelessWidget {
                             enabled: canInteract,
                             onTap: canInteract
                                 ? () => reactionService.toggleUpvote(
-                              post.id,
-                              user.uid,
-                              user.location,
-                            )
+                                      post.id,
+                                      user.uid,
+                                      user.location,
+                                    )
                                 : () => _showVerificationRequired(context),
                           ),
                           const SizedBox(width: 16), // Space between upvote and downvote
@@ -348,10 +365,10 @@ class PostCard extends StatelessWidget {
                             enabled: canInteract,
                             onTap: canInteract
                                 ? () => reactionService.toggleDownvote(
-                              post.id,
-                              user.uid,
-                              user.location,
-                            )
+                                      post.id,
+                                      user.uid,
+                                      user.location,
+                                    )
                                 : () => _showVerificationRequired(context),
                           ),
                         ],
@@ -428,7 +445,7 @@ class PostCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isActive ? activeColor.withValues(alpha: 0.1) : Colors.transparent,
+          color: isActive ? activeColor.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isActive ? activeColor : Colors.grey.shade300,
@@ -444,8 +461,8 @@ class PostCard extends StatelessWidget {
               color: isActive
                   ? activeColor
                   : enabled
-                  ? Colors.grey.shade600
-                  : Colors.grey.shade400,
+                      ? Colors.grey.shade600
+                      : Colors.grey.shade400,
             ),
             const SizedBox(width: 6),
             Text(
@@ -456,8 +473,8 @@ class PostCard extends StatelessWidget {
                 color: isActive
                     ? activeColor
                     : enabled
-                    ? Colors.grey.shade600
-                    : Colors.grey.shade400,
+                        ? Colors.grey.shade600
+                        : Colors.grey.shade400,
               ),
             ),
           ],

@@ -6,7 +6,6 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/custom_textfield.dart';
 import '../../providers/auth_provider.dart';
 import '../admin/admin_dashboard_screen.dart';
-import 'pending_approval_screen.dart';
 
 class AdminLoginScreen extends StatefulWidget {
   const AdminLoginScreen({super.key});
@@ -19,12 +18,14 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _passwordFocusNode = FocusNode();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -42,9 +43,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         final user = authProvider.currentUser;
 
         if (user?.isAdmin == true) {
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
+            (route) => false,
           );
         } else {
           await authProvider.signOut();
@@ -111,7 +113,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.goldenYellow.withValues(alpha: 0.3),
+                          color: AppColors.goldenYellow.withOpacity(0.3),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),
@@ -139,10 +141,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: AppColors.goldenYellow.withValues(alpha: 0.1),
+                    color: AppColors.goldenYellow.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: AppColors.goldenYellow.withValues(alpha: 0.3),
+                      color: AppColors.goldenYellow.withOpacity(0.3),
                     ),
                   ),
                   child: Row(
@@ -173,6 +175,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   hint: 'Enter your admin email',
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: const Icon(Icons.email_outlined, color: AppColors.goldenYellow),
+                  onFieldSubmitted: (_) {
+                    FocusScope.of(context).requestFocus(_passwordFocusNode);
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -186,10 +191,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 const SizedBox(height: 20),
                 CustomTextField(
                   controller: _passwordController,
+                  focusNode: _passwordFocusNode,
                   label: 'Password',
                   hint: 'Enter your password',
                   obscureText: _obscurePassword,
                   prefixIcon: const Icon(Icons.lock_outline, color: AppColors.goldenYellow),
+                  onFieldSubmitted: (_) => _signInWithEmail(),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword

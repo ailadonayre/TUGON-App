@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:tugon_app/screens/onboarding/login_screen.dart';
 import '../../utils/colors.dart';
 import '../../providers/admin_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -10,7 +11,6 @@ import 'user_statistics_screen.dart';
 import 'manage_posts_screen.dart';
 import 'manage_hotlines_screen.dart';
 import 'manage_reports_screen.dart';
-// --- 1. IMPORT THE NEW SCREEN ---
 import 'manage_appointments_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -92,7 +92,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             onPressed: () async {
               await authProvider.signOut();
               if (context.mounted) {
-                Navigator.of(context).pushReplacementNamed('/login');
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (Route<dynamic> route) => false,
+                );
               }
             },
           ),

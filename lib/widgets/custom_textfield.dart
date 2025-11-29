@@ -17,6 +17,8 @@ class CustomTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final bool enabled;
   final int maxLines;
+  final FocusNode? focusNode;
+  final void Function(String)? onFieldSubmitted;
 
   const CustomTextField({
     super.key,
@@ -33,6 +35,8 @@ class CustomTextField extends StatelessWidget {
     this.inputFormatters,
     this.enabled = true,
     this.maxLines = 1,
+    this.focusNode,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -51,6 +55,8 @@ class CustomTextField extends StatelessWidget {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
+          focusNode: focusNode,
+          onFieldSubmitted: onFieldSubmitted,
           textCapitalization: textCapitalization,
           obscureText: obscureText,
           keyboardType: keyboardType,

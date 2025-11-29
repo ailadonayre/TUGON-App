@@ -60,6 +60,25 @@ class FirestoreService {
     }
   }
 
+  Future<UserModel?> getUserById(String userId) async {
+    try {
+      final barangaysSnapshot = await _firestore.collection('barangays').get();
+
+      for (final barangayDoc in barangaysSnapshot.docs) {
+        final userDoc =
+            await barangayDoc.reference.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+          return UserModel.fromMap(userDoc.data()!, userDoc.id);
+        }
+      }
+
+      return null; // User not found in any barangay
+    } catch (e) {
+      print('Error getting user by ID: $e');
+      throw Exception('Failed to get user by ID: ${e.toString()}');
+    }
+  }
+
   Future<UserModel?> getUserByUid(String uid, LocationData location) async {
     try {
       final barangayDocId = location.toDocumentId();

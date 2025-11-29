@@ -10,10 +10,12 @@ import 'user_hotlines_screen.dart';
 import 'submit_report_screen.dart';
 import 'user_reports_tracker_screen.dart';
 import 'request_document_screen.dart';
+import 'user_profile_screen.dart';
 
 
 class UserHomeScreen extends StatefulWidget {
-  const UserHomeScreen({super.key});
+  final VoidCallback? onProfileTap;
+  const UserHomeScreen({super.key, this.onProfileTap});
 
   @override
   State<UserHomeScreen> createState() => _UserHomeScreenState();
@@ -68,19 +70,22 @@ class _UserHomeScreenState extends State<UserHomeScreen> with SingleTickerProvid
                         ),
                         const Spacer(),
                         // User Profile Picture
-                        CircleAvatar(
-                          radius: 18,
-                          backgroundColor: AppColors.brightBlue.withOpacity(0.2),
-                          backgroundImage: user?.profilePictureUrl != null && user!.profilePictureUrl!.isNotEmpty
-                              ? NetworkImage(user.profilePictureUrl!)
-                              : null,
-                          child: user?.profilePictureUrl == null || user!.profilePictureUrl!.isEmpty
-                              ? Icon(
-                                  Icons.person,
-                                  color: AppColors.brightBlue,
-                                  size: 20,
-                                )
-                              : null,
+                        GestureDetector(
+                          onTap: widget.onProfileTap,
+                          child: CircleAvatar(
+                            radius: 18,
+                            backgroundColor: AppColors.brightBlue.withOpacity(0.2),
+                            backgroundImage: user?.profilePictureUrl != null && user!.profilePictureUrl!.isNotEmpty
+                                ? NetworkImage(user.profilePictureUrl!)
+                                : null,
+                            child: user?.profilePictureUrl == null || user!.profilePictureUrl!.isEmpty
+                                ? Icon(
+                                    Icons.person,
+                                    color: AppColors.brightBlue,
+                                    size: 20,
+                                  )
+                                : null,
+                          ),
                         ),
                       ],
                     ),
