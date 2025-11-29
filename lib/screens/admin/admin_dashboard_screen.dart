@@ -39,6 +39,32 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     }
   }
 
+  Future<void> _updateProfilePicture() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Processing...')),
+    );
+
+    try {
+      await authProvider.updateUserProfilePicture();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile picture updated!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update picture: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -101,23 +127,41 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   ),
                   child: Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+                      GestureDetector(
+                        onTap: _updateProfilePicture,
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            CircleAvatar(
+                              radius: 40,
+                              backgroundColor: AppColors.white,
+                              backgroundImage: authProvider.currentUser?.profilePictureUrl != null &&
+                                  authProvider.currentUser!.profilePictureUrl!.isNotEmpty
+                                  ? NetworkImage(authProvider.currentUser!.profilePictureUrl!)
+                                  : null,
+                              child: authProvider.currentUser?.profilePictureUrl == null ||
+                                  authProvider.currentUser!.profilePictureUrl!.isEmpty
+                                  ? const Icon(
+                                      Icons.admin_panel_settings,
+                                      size: 40,
+                                      color: AppColors.brightBlue,
+                                    )
+                                  : null,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: AppColors.goldenYellow,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: AppColors.white, width: 2),
+                              ),
+                              child: const Icon(
+                                Icons.camera_alt,
+                                size: 14,
+                                color: AppColors.white,
+                              ),
                             ),
                           ],
-                        ),
-                        child: const Icon(
-                          Icons.admin_panel_settings,
-                          size: 32,
-                          color: AppColors.brightBlue,
                         ),
                       ),
                       const SizedBox(width: 16),

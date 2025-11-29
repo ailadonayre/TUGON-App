@@ -6,6 +6,7 @@ import '../../widgets/custom_button.dart';
 import '../../providers/user_provider.dart';
 import '../../services/location_service.dart';
 import 'residency_check_screen.dart';
+import '../onboarding/login_screen.dart';
 
 class LocationSelectionScreen extends StatefulWidget {
   const LocationSelectionScreen({super.key});
@@ -83,7 +84,12 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.charcoalBlack),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const LoginScreen()),
+              (route) => false,
+            );
+          },
         ),
       ),
       body: SafeArea(

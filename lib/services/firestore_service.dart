@@ -368,13 +368,20 @@ class FirestoreService {
           .collection('users')
           .get();
 
-      int total = allUsers.docs.length;
+      int total = 0;
       int pending = 0;
       int approved = 0;
       int rejected = 0;
 
       for (var doc in allUsers.docs) {
-        final status = doc.data()['status'] as String?;
+        final data = doc.data();
+        final isAdmin = data['isAdmin'] as bool? ?? false;
+
+        // Skip admin accounts
+        if (isAdmin) continue;
+
+        total++;
+        final status = data['status'] as String?;
         switch (status) {
           case 'pending_review':
             pending++;
