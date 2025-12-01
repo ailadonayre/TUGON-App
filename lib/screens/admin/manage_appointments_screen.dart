@@ -17,7 +17,7 @@ class ManageAppointmentsScreen extends StatefulWidget {
 }
 
 class _ManageAppointmentsScreenState extends State<ManageAppointmentsScreen> {
-  String _selectedFilter = 'pending';
+  String _selectedFilter = 'all';
 
   @override
   Widget build(BuildContext context) {
@@ -46,11 +46,11 @@ class _ManageAppointmentsScreenState extends State<ManageAppointmentsScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
+                  _buildFilterChip('All', 'all'),
                   _buildFilterChip('Pending', 'pending'),
                   _buildFilterChip('Approved', 'approved'),
                   _buildFilterChip('Rescheduled', 'rescheduled'),
                   _buildFilterChip('Rejected', 'rejected'),
-                  _buildFilterChip('All', 'all'),
                 ],
               ),
             ),

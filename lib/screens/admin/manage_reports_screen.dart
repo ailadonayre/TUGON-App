@@ -52,6 +52,8 @@ class _ManageReportsScreenState extends State<ManageReportsScreen> {
                   _buildFilterChip('In Progress', 'in_progress'),
                   const SizedBox(width: 8),
                   _buildFilterChip('Resolved', 'resolved'),
+                  const SizedBox(width: 8),
+                  _buildFilterChip('Rejected', 'rejected'),
                 ],
               ),
             ),
