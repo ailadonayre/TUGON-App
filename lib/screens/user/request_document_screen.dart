@@ -58,6 +58,18 @@ class _RequestDocumentScreenState extends State<RequestDocumentScreen> {
       return;
     }
 
+    // Check if user is fully verified
+    if (!user.isFullyVerified) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please complete your profile verification to request documents.'),
+          backgroundColor: AppColors.coralRed,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     if (_selectedDocuments.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select at least one document.'), backgroundColor: Colors.red),

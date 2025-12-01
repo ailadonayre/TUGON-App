@@ -32,7 +32,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final user = authProvider.currentUser;
 
-    if (user?.status != 'approved') {
+    if (user?.isFullyVerified != true) {
       _showVerificationRequiredDialog();
     } else {
       Navigator.push(
@@ -57,10 +57,14 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       statusLabel = 'Account Rejected';
       message =
       'Your account registration was rejected. Please contact your barangay office for more information.';
+    } else if (user?.verificationStatus == 'partially_verified') {
+      statusLabel = 'Profile Incomplete';
+      message =
+      'Please complete your profile information to unlock all features including posting, commenting, submitting reports, and requesting documents.';
     } else {
       statusLabel = 'Verification Required';
       message =
-      'Complete your profile verification to unlock community posting features.';
+      'Complete your profile verification to unlock all features including posting, commenting, submitting reports, and requesting documents.';
     }
 
     showDialog(

@@ -38,6 +38,18 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
     if (user == null) return;
 
+    // Check if user is fully verified
+    if (!user.isFullyVerified) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please complete your profile verification to comment on posts.'),
+          backgroundColor: AppColors.coralRed,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
 
     try {
@@ -293,14 +305,19 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   Expanded(
                     child: TextField(
                       controller: _commentController,
+                      enabled: user.isFullyVerified,
                       decoration: InputDecoration(
-                        hintText: 'Write a comment...',
+                        hintText: user.isFullyVerified
+                            ? 'Write a comment...'
+                            : 'Complete profile verification to comment',
                         hintStyle: GoogleFonts.dmSans(
                           fontSize: 14,
                           color: Colors.grey.shade400,
                         ),
                         filled: true,
-                        fillColor: Colors.grey.shade100,
+                        fillColor: user.isFullyVerified
+                            ? Colors.grey.shade100
+                            : Colors.grey.shade200,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
                           borderSide: BorderSide.none,
@@ -317,7 +334,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   ),
                   const SizedBox(width: 8),
                   IconButton(
-                    onPressed: _isSubmitting ? null : _submitComment,
+                    onPressed: (_isSubmitting || !user.isFullyVerified) ? null : _submitComment,
                     icon: _isSubmitting
                         ? SizedBox(
                             width: 20,
@@ -327,7 +344,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                               color: borderColor,
                             ),
                           )
-                        : Icon(Icons.send, color: borderColor),
+                        : Icon(Icons.send, color: user.isFullyVerified ? borderColor : Colors.grey),
                   ),
                 ],
               ),

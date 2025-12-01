@@ -334,6 +334,18 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
 
     if (user == null) return;
 
+    // Check if user is fully verified
+    if (!user.isFullyVerified) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please complete your profile verification to submit reports.'),
+          backgroundColor: AppColors.coralRed,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
 
     try {
