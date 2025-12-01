@@ -32,6 +32,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
 
     _controller.forward();
+
+    // Precache all logo images used throughout the app
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      precacheImage(const AssetImage('assets/logo/TUGON_logo.png'), context);
+      precacheImage(const AssetImage('assets/logo/TUGON_Logo-uppercase.png'), context);
+      precacheImage(const AssetImage('assets/logo/TUGON_Logo-white.png'), context);
+      precacheImage(const AssetImage('assets/logo/TUGON_Logo-lowercase-v2.png'), context);
+    });
+
     _navigateToOnboarding();
   }
 

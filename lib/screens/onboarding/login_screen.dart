@@ -255,20 +255,22 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     // Top Section with Logo and Sign In Text
                     Expanded(
                       flex: 2,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Padding(
-                          padding: const EdgeInsets.all(32.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                'assets/logo/TUGON_Logo-white.png',
-                                width: 100,
-                                height: 100,
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Logo appears immediately without animation
+                            Image.asset(
+                              'assets/logo/TUGON_Logo-white.png',
+                              width: 100,
+                              height: 100,
+                            ),
+                            const SizedBox(height: 20),
+                            // Sign In text still has fade animation
+                            FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: Text(
                                 'Sign In',
                                 style: GoogleFonts.dmSans(
                                   fontSize: 40,
@@ -277,8 +279,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   letterSpacing: 1.5,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

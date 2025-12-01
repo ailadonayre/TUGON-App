@@ -15,7 +15,7 @@ class ManagePostsScreen extends StatefulWidget {
 }
 
 class _ManagePostsScreenState extends State<ManagePostsScreen> {
-  String _selectedFilter = 'all'; // 'all', 'pinned', 'critical'
+  String _selectedFilter = 'all'; // 'all', 'admin', 'user', 'pinned', 'critical'
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +66,10 @@ class _ManagePostsScreenState extends State<ManagePostsScreen> {
                 children: [
                   _buildFilterChip('All Posts', 'all'),
                   const SizedBox(width: 8),
+                  _buildFilterChip('Admin Posts', 'admin'),
+                  const SizedBox(width: 8),
+                  _buildFilterChip('User Posts', 'user'),
+                  const SizedBox(width: 8),
                   _buildFilterChip('Pinned', 'pinned'),
                   const SizedBox(width: 8),
                   _buildFilterChip('Critical', 'critical'),
@@ -105,7 +109,11 @@ class _ManagePostsScreenState extends State<ManagePostsScreen> {
                 }).toList();
 
                 // Filter client-side based on selected filter
-                if (_selectedFilter == 'pinned') {
+                if (_selectedFilter == 'admin') {
+                  posts = posts.where((p) => p.type == 'barangay').toList();
+                } else if (_selectedFilter == 'user') {
+                  posts = posts.where((p) => p.type == 'community').toList();
+                } else if (_selectedFilter == 'pinned') {
                   posts = posts.where((p) => p.pinned).toList();
                 } else if (_selectedFilter == 'critical') {
                   posts = posts.where((p) => p.isCritical).toList();
