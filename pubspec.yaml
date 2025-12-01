@@ -1,4 +1,4 @@
-name: TUGON
+name: tugon_app
 description: A barangay help mobile app for community services, reports, and announcements.
 publish_to: 'none'
 version: 1.0.0+1
@@ -60,7 +60,4 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/logo/TUGON_logo.png"
-  remove_alpha_ios: true  # Required for Apple App Store submission
-  # Uncomment below for adaptive icon on Android (recommended)
-  # adaptive_icon_background: "#FFFFFF"
-  # adaptive_icon_foreground: "assets/logo/TUGON_logo.png"
+  remove_alpha_ios: true
