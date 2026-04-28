@@ -160,6 +160,7 @@ flutter run
 | **Alcaraz, John**          | https://github.com/JohnAlcaraz02 |
 | **Carranza, John Timothy** | https://github.com/Carranza-John-Timothy |
 | **Donayre, Aila Roshiele** | https://github.com/ailadonayre |
+| **Gonda, Paul Raimiel**    | https://github.com/Paul-Raimiel-Gonda |
 | **Ramirez, Kent Ian**      | https://github.com/KentRamriez |
 | **Rivera, Irish**          | https://github.com/kelleeerrrr |
 
